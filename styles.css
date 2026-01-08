@@ -138,8 +138,19 @@ body:not(.has-scrolled) .roadmap__item[data-roadmap-jump="overview-1"] .roadmap_
 }
 
 @media (max-width: 980px){
-  /* On smaller screens, the dock can crowd the cinematic layout; keep the menu instead. */
-  .roadmap{display:none}
+  /* Keep navigation available on smaller screens (menu removed). Show a compact dots-only dock. */
+  .roadmap{
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    padding: 8px;
+    gap: 6px;
+    opacity: .96;
+  }
+  .roadmap__item{
+    padding: 8px;
+  }
+  .roadmap__label{
+    display:none;
+  }
 }
 
 button{font-family: inherit}
