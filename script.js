@@ -518,23 +518,49 @@
       requestAnimationFrame(render);
     };
 
-    // Tap/click anywhere to skip (mobile-friendly).
-    onFirstUserGesture(finish, { signal });
-
     addisonVideo.loop = false;
-    // Mobile Safari blocks unmuted autoplay when this is triggered by scroll/timeline.
-    // Prefer muted autoplay on coarse pointers, so the interstitial actually plays.
-    addisonVideo.muted = isCoarsePointer;
-    if (isCoarsePointer) addisonVideo.volume = 0;
+    addisonVideo.muted = false;
+    addisonVideo.volume = 1;
     addisonVideo.currentTime = 0;
     setCursorForVideo(addisonVideo);
-    const playP = addisonVideo.play?.();
-    if (playP && typeof playP.catch === "function") {
-      playP.catch(() => {
-        // If autoplay is blocked, don't leave the user on a black screen—skip forward.
-        window.setTimeout(finish, 0);
-      });
+
+    // Mobile browsers (especially iOS Safari) will not autoplay unmuted video without a user gesture.
+    // So on touch/coarse pointers: first tap starts playback with audio; subsequent tap skips.
+    let started = false;
+    const startPlayback = () => {
+      started = true;
+      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
+      tryPlay(addisonVideo);
+    };
+
+    if (isCoarsePointer) {
+      if (trailerTipEl) trailerTipEl.textContent = "Tap to Play";
+      // First gesture starts playback; next gesture skips.
+      onFirstUserGesture(startPlayback, { signal });
+      window.addEventListener(
+        "pointerdown",
+        (e) => {
+          if (!e?.isTrusted) return;
+          if (!started) return;
+          finish();
+        },
+        { capture: true, passive: true, signal },
+      );
+      window.addEventListener(
+        "touchstart",
+        (e) => {
+          if (!e?.isTrusted) return;
+          if (!started) return;
+          finish();
+        },
+        { capture: true, passive: true, signal },
+      );
+    } else {
+      // Desktop: try to autoplay with audio; click/tap skips.
+      tryPlay(addisonVideo);
+      onFirstUserGesture(finish, { signal });
     }
+
     addisonVideo.addEventListener("loadedmetadata", () => setCursorForVideo(addisonVideo), { once: true, signal });
     addisonVideo.addEventListener("timeupdate", () => setCursorForVideo(addisonVideo), { passive: true, signal });
     addisonVideo.addEventListener("ended", finish, { once: true, signal });
