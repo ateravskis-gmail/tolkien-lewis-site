@@ -953,7 +953,8 @@ body.is-home .overlay__titleLine--b{
   color: rgba(255,255,255,.72);
   background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.42));
 }
-@media (max-width: 860px){
+/* On medium widths we stack portraits; on phones we keep them side-by-side and small (see <=720px rules). */
+@media (max-width: 860px) and (min-width: 721px){
   .portraits{grid-template-columns: 1fr}
   .portraits{max-width: 100%}
 }

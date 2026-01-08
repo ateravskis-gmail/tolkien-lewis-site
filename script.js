@@ -256,16 +256,24 @@
 
     // Keep bg layer up (black base) for any segments that have assigned scene backgrounds,
     // preventing the map video from peeking between fades.
+    const inEpisodesSegment =
+      mode === "home" &&
+      episodesRange &&
+      // Hold the bg layer slightly before/after to cover fade edges.
+      p >= episodesRange.start - 0.01 &&
+      p <= episodesRange.end + 0.01;
+
     const inBgSegment =
       mode === "home" &&
       !isHomePhase &&
       bgSlidesWrap &&
       bgSegments.length > 0 &&
       bgSegments.some((s) => p >= s.start - 0.002 && p <= s.end + 0.002);
-    if (bgSlidesWrap) bgSlidesWrap.style.opacity = inBgSegment ? "1" : "0";
+    const inBgLayer = inBgSegment || inEpisodesSegment;
+    if (bgSlidesWrap) bgSlidesWrap.style.opacity = inBgLayer ? "1" : "0";
 
-    if (homeVideo) homeVideo.style.opacity = isHomePhase && !inBgSegment ? "0.92" : "0";
-    if (mapVideo) mapVideo.style.opacity = !isHomePhase && !inBgSegment ? "0.92" : "0";
+    if (homeVideo) homeVideo.style.opacity = isHomePhase && !inBgLayer ? "0.92" : "0";
+    if (mapVideo) mapVideo.style.opacity = !isHomePhase && !inBgLayer ? "0.92" : "0";
 
     // Addison's Walk interstitial (once): after overview-3 and before imperative.
     if (mode === "home" && !addisonPlayed && addisonTriggerAt != null && imperativeRange != null && p >= addisonTriggerAt) {
