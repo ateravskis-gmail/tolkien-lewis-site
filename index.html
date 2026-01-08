@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Documentary film project: The War for Middle-earth — an untold story about war, friendship, and imagination."
+    />
+    <title>THE WAR FOR MIDDLE-EARTH — Documentary Film Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500..900&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=nar17" />
+  </head>
+  <body>
+    <div class="menu" data-menu>
+      <button class="menu__btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menuPanel">
+        Menu
+      </button>
+      <div class="menu__panel" id="menuPanel" data-menu-panel hidden>
+        <button class="menu__item" type="button" data-jump="home">Home</button>
+        <div class="menu__sep" aria-hidden="true"></div>
+        <button class="menu__item" type="button" data-jump="overview-1">Overview</button>
+        <button class="menu__item" type="button" data-jump="imperative">The Imperative</button>
+        <button class="menu__item" type="button" data-jump="approach">Approach &amp; Synopsis</button>
+        <button class="menu__item" type="button" data-jump="episodes">Episodes</button>
+        <button class="menu__item" type="button" data-jump="contact">Contact</button>
+      </div>
+    </div>
+
+    <div class="intro" data-intro>
+      <div class="intro__frame" role="group" aria-label="Opening quote">
+        <p class="intro__quote" aria-live="polite">
+          <span class="intro__line" style="--d: 250ms">“Well, Tollers…</span>
+          <span class="intro__line intro__line--dim" style="--d: 1800ms">If they won’t write the kinds of books we want to read,</span>
+          <span class="intro__line" style="--d: 4000ms">we shall have to write them ourselves.”</span>
+        </p>
+
+        <div class="intro__author" style="--d: 5000ms">— C.S. Lewis</div>
+
+        <button class="intro__skip" type="button" data-skip style="--d: 5500ms">
+          Enter
+        </button>
+      </div>
+    </div>
+
+    <div class="stage" data-stage>
+      <video
+        class="stage__video stage__video--home"
+        data-home
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="./assets/trailer-poster.svg"
+        aria-label="Home background video"
+      >
+        <source src="./assets/BurningPlaneGif.mp4?v=nar17" type="video/mp4" />
+      </video>
+
+      <video
+        class="stage__video stage__video--map"
+        data-map
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="./assets/trailer-poster.svg"
+        aria-label="Background video"
+      >
+        <source src="./assets/MiddleEarthMap.mp4?v=nar17" type="video/mp4" />
+      </video>
+
+      <!-- Background slides (crossfade behind cards) -->
+      <div class="bg-slides" aria-hidden="true">
+        <div class="bg-slide" data-bg="overview-1" style="background-image:url('./assets/WWI.jpg')"></div>
+        <div class="bg-slide" data-bg="overview-2" style="background-image:url('./assets/2LMR64BE.jpg')"></div>
+        <div class="bg-slide" data-bg="overview-3" style="background-image:url('./assets/Oxford.jpg')"></div>
+        <video class="bg-video" data-bg="imperative" muted loop playsinline preload="metadata">
+          <source src="./assets/WFME_BG.mp4?v=nar17" type="video/mp4" />
+        </video>
+        <video class="bg-video" data-bg="approach" muted loop playsinline preload="metadata">
+          <source src="./assets/OxfordBG.mp4?v=nar17" type="video/mp4" />
+        </video>
+        <div class="bg-slide" data-bg="ep1" style="background-image:url('./assets/WWI_soldiers.jpg')"></div>
+        <div class="bg-slide" data-bg="ep2" style="background-image:url('./assets/Ep2.jpg')"></div>
+        <div class="bg-slide" data-bg="ep3" style="background-image:url('./assets/Ep3.jpg')"></div>
+        <div class="bg-slide" data-bg="ep4" style="background-image:url('./assets/Microphone.jpg')"></div>
+        <div class="bg-slide" data-bg="ep5" style="background-image:url('./assets/ep5.jpg')"></div>
+      </div>
+
+      <video
+        class="stage__trailer"
+        data-trailer
+        preload="metadata"
+        playsinline
+        aria-label="Trailer"
+      >
+        <source src="./assets/Trailer.mp4?v=nar17" type="video/mp4" />
+      </video>
+
+      <video
+        class="stage__interstitial"
+        data-addison
+        preload="metadata"
+        playsinline
+        aria-label="Addison's Walk"
+      >
+        <source src="./assets/AddisonsWalk.mp4?v=nar17" type="video/mp4" />
+      </video>
+
+      <div class="trailer-cursor" data-trailer-cursor aria-hidden="true">
+        <div class="trailer-cursor__time" data-trailer-time>0:00 / 0:00</div>
+        <div class="trailer-cursor__tip">Click to Skip</div>
+      </div>
+
+      <div class="stage__vignette" aria-hidden="true"></div>
+      <div class="stage__grain" aria-hidden="true"></div>
+
+      <div class="overlay overlay--title" data-layer="title">
+        <div class="overlay__inner">
+          <div class="overlay__kicker">DOCUMENTARY FILM PROJECT</div>
+          <h1 class="overlay__title">
+            <span class="overlay__titleLine overlay__titleLine--a">THE WAR FOR</span><br />
+            <span class="overlay__titleLine overlay__titleLine--b">MIDDLE-EARTH</span>
+          </h1>
+          <p class="overlay__sub">An untold story about war, friendship, and imagination.</p>
+          <div class="overlay__prompt" aria-hidden="true">
+            Scroll to enter the story
+          </div>
+        </div>
+      </div>
+
+      <!-- STORY PANELS (all original copy retained; scroll controls which panel is in view) -->
+      <div class="overlay overlay--panel" data-scene="overview-1">
+        <div class="card card--panel">
+          <div class="card__label">Overview</div>
+          <div class="portraits" aria-label="Portraits">
+            <figure class="portrait">
+              <img src="./assets/cs_lewis_soldier.jpg" alt="C.S. Lewis" loading="lazy" />
+              <figcaption>C.S. Lewis</figcaption>
+            </figure>
+            <figure class="portrait">
+              <img src="./assets/Tolkien_1916.jpg" alt="J.R.R. Tolkien" loading="lazy" />
+              <figcaption>J.R.R. Tolkien</figcaption>
+            </figure>
+          </div>
+          <div class="prose">
+            <p class="lead">
+              The lives of two of the most influential Christian authors in modern times were shaped decisively by war:
+              Serving as second lieutenants in the British military, J.R.R. Tolkien and C.S. Lewis survived the
+              mechanized slaughter of the First World War.
+            </p>
+          </div>
+
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="overview-2">
+        <div class="card card--panel">
+          <div class="card__label">Overview</div>
+          <div class="prose">
+            <p>
+              Yet when they returned home, they discovered that the traditions, beliefs, ideals central to Western
+              civilization were under assault.
+            </p>
+            <p>
+              The First World War created a storm of disillusionment and cynicism about human freedom, democratic
+              values, free-market capitalism, and traditional religion. A raft of ideologies rushed in to fill the void:
+              communism, fascism, eugenics, scientism, modernism, and totalitarianism.
+            </p>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="overview-3">
+        <div class="card card--panel">
+          <div class="card__label">Overview</div>
+          <div class="prose">
+            <p>
+              Oxford University, where both men took up their posts as instructors in English literature, was not immune
+              to the crisis enveloping Europe. Tolkien and Lewis were determined to fight back.
+            </p>
+            <p>
+              In the mid-1930s, as a “gathering storm” of evil descended upon the European continent, they rededicated
+              themselves to their scholarly and literary pursuits. “Well, Tollers,” Lewis announced to Tolkien. “If
+              they won’t write the kinds of books we want to read, we shall have to write them ourselves.”
+            </p>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="imperative" data-len="2">
+        <div class="card card--panel">
+          <div class="card__label">The Project’s Imperative</div>
+          <div class="prose">
+            <p class="lead">
+              The creative friendship between Tolkien and Lewis offers an enduring and inspiring model of cultural
+              leadership. We, too, face a cultural crisis: fresh assaults on the political, moral, and religious ideals
+              that shaped Western civilization and made possible the American experiment in ordered freedom. By
+              exploring, with great care and sensitivity, the lives and achievements of Tolkien and Lewis, our film
+              series will reveal how their shared moral vision—lived out in their personal and professional lives—created
+              a new beachhead for what philosopher Russel Kirk called “the permanent things” amid a deeply hostile
+              culture.
+            </p>
+          </div>
+          <div class="callout callout--dark">
+            <div class="callout__title"></div>
+            <p class="callout__text">
+              This extraordinary story of war, friendship, faith, and imagination has never been told before: We intend to tell it.
+            </p>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="approach" data-len="2">
+        <div class="card card--panel">
+          <div class="card__label">Approach and Synopsis</div>
+          <div class="prose">
+            <p class="lead">
+              The film will be based on Joseph Loconte’s New York Times bestseller, <span class="highlight">A Hobbit, a Wardrobe, and a Great
+              War</span> and on his newly released book, <span class="highlight">The War for Middle-earth: J.R.R. Tolkien and C.S. Lewis Confront the
+              Gathering Storm, 1933-1945</span>. Mr. Loconte will serve as the film’s historian, screenwriter, and host.
+            </p>
+          </div>
+          <div class="facts facts--dark" aria-label="Format">
+            <div class="fact">
+              <div class="fact__k">Format</div>
+              <div class="fact__v">Five-part documentary series</div>
+            </div>
+            <div class="fact">
+              <div class="fact__k">Total Run-time</div>
+              <div class="fact__v">About 90 minutes</div>
+            </div>
+            <div class="fact">
+              <div class="fact__k">Historian / Host</div>
+              <div class="fact__v">Joseph Loconte</div>
+            </div>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--episodes" data-scene="episodes" data-len="3">
+        <div class="episodesTop">
+          <div class="card card--panel">
+            <div class="card__label">Episodes</div>
+            <div class="prose">
+              <p class="lead">
+                Five chapters tracing how war and imagination shaped two writers—and how their friendship offered a
+                cultural counteroffensive.
+              </p>
+            </div>
+            <div class="scrollPrompt scrollPrompt--alt" aria-hidden="true">Hover / click an episode below</div>
+          </div>
+        </div>
+
+        <nav class="episodesDock" aria-label="Episodes">
+          <button class="epCard" type="button" data-ep="1">
+            <div class="epCard__tag">EPISODE 1</div>
+            <div class="epCard__title">THE END OF ILLUSIONS</div>
+            <div class="epCard__years">(1916-1925)</div>
+            <div class="epCard__body">
+              We step back and begin in the years before WW1: We learn about the pre-war innocence of the generation
+              of Tolkien and Lewis, the “myth of progress” leading up to the outbreak of the Great War. We learn about
+              the literary interests and experiences of Tolkien and Lewis in these years. We watch them go off to
+              fight in the trenches of France and learn about the devastating impact of the war on their lives and on
+              their entire generation.
+            </div>
+          </button>
+
+          <button class="epCard" type="button" data-ep="2">
+            <div class="epCard__tag">EPISODE 2</div>
+            <div class="epCard__title">ENEMIES OF THE PERMANENT THINGS</div>
+            <div class="epCard__years">(1926-1933)</div>
+            <div class="epCard__body">
+              We learn about the ideologies that took flight in the aftermath and disillusionment of WW1: communism,
+              fascism, Nazism, and totalitarianism. We learn about the first meeting between Tolkien and Lewis (1926)
+              as scholars at Oxford and their shared love of epic and mythological literature. We explore their
+              deepening friendship and Tolkien’s role in Lewis’s conversion to Christianity. We explore the political
+              significance of 1933, which witnessed the beginning or the unraveling of the international political
+              order and the rise of Hitler and the Nazi Party in Germany.
+            </div>
+          </button>
+
+          <button class="epCard" type="button" data-ep="3">
+            <div class="epCard__tag">EPISODE 3</div>
+            <div class="epCard__title">WHEN DRAGONS ROAM THE EARTH</div>
+            <div class="epCard__years">(1933-1939)</div>
+            <div class="epCard__body">
+              We watch the rise of totalitarian aggression in Asia and Europe and the failure of the democratic
+              Allies to do anything about it, culminating in the infamous 1938 Munich Pact, the prelude to Second
+              World War. We learn about the careers of Tolkien and Lewis through the 1930s: Tolkien publishes The
+              Hobbit, delivers a groundbreaking talk on Beowulf, and begins writing The Lord of the Rings; Lewis
+              writes the first of the Ransom Trilogy, delivers his famous sermon “Learning in Wartime,” and gets the
+              idea for the opening lines of The Lion, the Witch, and the Wardrobe.
+            </div>
+          </button>
+
+          <button class="epCard" type="button" data-ep="4">
+            <div class="epCard__tag">EPISODE 4</div>
+            <div class="epCard__title">THE INKLINGS GO TO WAR</div>
+            <div class="epCard__years">(1939-1942)</div>
+            <div class="epCard__body">
+              We learn about the ways in which Tolkien and Lewis supported Britain’s war effort on the home front. We
+              trace Tolkien’s progress as he writes The Lord of the Rings. We learn about the origin of Lewis’s idea
+              for The Screwtape Letters (from a radio broadcast of a Hitler speech) and his radio lectures for the
+              BBC, which form the basis for his classic work Mere Christianity. We learn why Great Britain—and the
+              rest of the democratic West—faced an existential threat to its survival.
+            </div>
+          </button>
+
+          <button class="epCard" type="button" data-ep="5">
+            <div class="epCard__tag">EPISODE 5</div>
+            <div class="epCard__title">THE FAR-OFF COUNTRY</div>
+            <div class="epCard__years">(1942-1945)</div>
+            <div class="epCard__body">
+              We learn how the deep friendship between Tolkien and Lewis transformed their lives and literary careers
+              and how they supported each other during the darkest days of WW2. We explore how the events of the
+              Second World War influenced some of the great themes of Tolkien’s epic story: the worth of every
+              individual, the importance of heroism, and the perennial struggle between good and evil.
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="contact">
+        <div class="card card--panel">
+          <div class="card__label">Next step</div>
+          <div class="prose">
+            <p class="lead">
+              We’re seeking <strong>$500,000</strong> to bring this project to the screen.
+            </p>
+            <p>
+              If you’re interested in learning more, we’d love to share the deck, timeline, and production plan.
+            </p>
+          </div>
+          <div class="card__actions">
+            <a
+              class="card__btn"
+              href="mailto:joe@josephloconte.com?cc=andrew@noblestoryco.com,adam@noblestoryco.com&subject=I%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth&body=Hi%20Joe%2C%0A%0AI%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth.%0A%0ACould%20you%20share%20more%20details%20on%20the%20project%20scope%2C%20timeline%2C%20and%20how%20the%20%24500%2C000%20will%20be%20used%3F%0A%0AThank%20you%2C%0A%5BYour%20Name%5D"
+            >
+              Email Team
+            </a>
+            <button class="card__btn" type="button" data-restart>Replay opening</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll controls a timeline; the visuals remain fixed to create “entering the field of view”. -->
+    <div class="scrollspace" data-scrollspace aria-hidden="true"></div>
+
+    <script src="./script.js?v=nar17"></script>
+  </body>
+</html>
+
+

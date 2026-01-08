@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-label="Placeholder still: a circle of friends by lamplight">
+  <defs>
+    <linearGradient id="room" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="0.7" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#04060b"/>
+    </linearGradient>
+    <radialGradient id="lampGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#f0d8a3" stop-opacity="0.35"/>
+      <stop offset="0.28" stop-color="#d7b86a" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wood" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#171a24"/>
+      <stop offset="1" stop-color="#0a0f18"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.22 0"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="900" fill="url(#room)"/>
+  <rect width="1400" height="900" fill="url(#lampGlow)"/>
+
+  <!-- Table -->
+  <path d="M0 700 C260 620, 520 760, 760 700 C980 646, 1140 760, 1400 705 L1400 900 L0 900 Z" fill="url(#wood)" opacity="0.95"/>
+  <path d="M0 760 C300 700, 520 820, 820 770 C1060 730, 1220 820, 1400 790 L1400 900 L0 900 Z" fill="#05070c" opacity="0.92"/>
+
+  <!-- Lamp -->
+  <g>
+    <path d="M700 540 L680 640 L720 640 Z" fill="#0b101a" opacity="0.95"/>
+    <path d="M650 520 C680 470, 720 470, 750 520 C730 560, 670 560, 650 520 Z" fill="#0b101a" opacity="0.92"/>
+    <ellipse cx="700" cy="520" rx="50" ry="14" fill="#0b101a" opacity="0.92"/>
+    <circle cx="700" cy="520" r="9" fill="#f0d8a3" opacity="0.65"/>
+  </g>
+
+  <!-- Books / papers on table -->
+  <g opacity="0.80">
+    <rect x="410" y="660" width="140" height="40" rx="8" fill="#0a0f18"/>
+    <rect x="860" y="670" width="170" height="46" rx="8" fill="#0a0f18"/>
+    <rect x="560" y="685" width="130" height="34" rx="7" fill="#0a0f18"/>
+    <path d="M905 670 h85 v46 h-85 z" fill="#f0d8a3" opacity="0.10"/>
+    <path d="M445 660 h72 v40 h-72 z" fill="#8aa3b9" opacity="0.10"/>
+  </g>
+
+  <!-- Seated silhouettes -->
+  <g fill="#0a0f18" opacity="0.94">
+    <path d="M260 710 c10 -60 60 -90 100 -70 c35 18 45 60 40 90 c-40 20 -100 20 -140 -20z"/>
+    <path d="M460 720 c10 -65 70 -95 115 -72 c38 19 50 64 44 95 c-45 24 -112 20 -159 -23z"/>
+    <path d="M980 724 c10 -65 70 -95 115 -72 c38 19 50 64 44 95 c-45 24 -112 20 -159 -23z"/>
+    <path d="M1120 712 c10 -60 60 -90 100 -70 c35 18 45 60 40 90 c-40 20 -100 20 -140 -20z"/>
+  </g>
+
+  <!-- Warm rim light strokes -->
+  <g stroke="#f0d8a3" opacity="0.14" stroke-width="5" stroke-linecap="round">
+    <path d="M260 660 c35 -30 95 -30 120 5"/>
+    <path d="M470 668 c40 -35 110 -35 140 8"/>
+    <path d="M980 670 c40 -35 110 -35 140 8"/>
+    <path d="M1120 662 c35 -30 95 -30 120 5"/>
+  </g>
+
+  <!-- Title strip -->
+  <g>
+    <rect x="70" y="70" width="480" height="56" rx="16" fill="rgba(10,12,20,0.58)" stroke="rgba(215,184,106,0.18)"/>
+    <text x="92" y="107" fill="rgba(240,216,163,0.90)" font-family="ui-serif, Georgia, 'Times New Roman', Times, serif" font-size="24" letter-spacing="2">
+      FRIENDSHIP • IMAGINATION
+    </text>
+  </g>
+
+  <rect width="1400" height="900" filter="url(#grain)" opacity="0.18"/>
+</svg>
+
+
+

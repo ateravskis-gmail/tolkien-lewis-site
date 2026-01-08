@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-label="Placeholder still: soldiers in trenches">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="0.55" stop-color="#070b14"/>
+      <stop offset="1" stop-color="#04060b"/>
+    </linearGradient>
+    <radialGradient id="flare" cx="35%" cy="20%" r="70%">
+      <stop offset="0" stop-color="#f0d8a3" stop-opacity="0.22"/>
+      <stop offset="0.35" stop-color="#d7b86a" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mud" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1a1e28"/>
+      <stop offset="0.55" stop-color="#0f141f"/>
+      <stop offset="1" stop-color="#070a12"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.25 0"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="900" fill="url(#sky)"/>
+  <rect width="1400" height="900" fill="url(#flare)"/>
+
+  <!-- Distant smoke -->
+  <g opacity="0.55">
+    <path d="M0 360 C220 320, 420 420, 640 380 C830 346, 1040 420, 1400 360 L1400 520 L0 520 Z" fill="#0a0f18"/>
+    <path d="M0 410 C260 370, 520 470, 740 430 C960 390, 1140 480, 1400 420 L1400 560 L0 560 Z" fill="#070a12"/>
+  </g>
+
+  <!-- Barbed wire silhouettes -->
+  <g stroke="#1e2a3a" stroke-width="4" opacity="0.75">
+    <path d="M-40 540 C180 490, 420 600, 640 550 C880 495, 1100 620, 1440 560" fill="none"/>
+    <path d="M-60 585 C200 520, 440 650, 700 585 C940 530, 1160 650, 1460 600" fill="none"/>
+  </g>
+  <g stroke="#2c3c52" stroke-width="2" opacity="0.65">
+    <path d="M110 532 l22 -18 m-18 0 l18 18" />
+    <path d="M420 582 l22 -18 m-18 0 l18 18" />
+    <path d="M760 552 l22 -18 m-18 0 l18 18" />
+    <path d="M1090 602 l22 -18 m-18 0 l18 18" />
+  </g>
+
+  <!-- Foreground trench -->
+  <path d="M0 610 C240 560, 470 700, 710 640 C950 580, 1140 740, 1400 670 L1400 900 L0 900 Z" fill="url(#mud)"/>
+  <path d="M0 690 C220 660, 420 740, 680 700 C910 664, 1120 760, 1400 730 L1400 900 L0 900 Z" fill="#05070c" opacity="0.85"/>
+
+  <!-- Helmet silhouettes -->
+  <g fill="#0a0f18" opacity="0.92">
+    <path d="M320 660 c35 -60 105 -60 140 0 c-10 25 -40 45 -70 45 c-30 0 -60 -20 -70 -45z"/>
+    <rect x="362" y="685" width="54" height="18" rx="9"/>
+
+    <path d="M910 700 c30 -52 90 -52 120 0 c-8 22 -34 39 -60 39 c-26 0 -52 -17 -60 -39z"/>
+    <rect x="947" y="722" width="46" height="16" rx="8"/>
+  </g>
+
+  <!-- Subtle grain overlay -->
+  <rect width="1400" height="900" filter="url(#grain)" opacity="0.18"/>
+</svg>
+
+
+
