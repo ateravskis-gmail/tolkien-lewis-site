@@ -17,20 +17,41 @@
     <link rel="stylesheet" href="./styles.css?v=nar17" />
   </head>
   <body>
-    <div class="menu" data-menu>
-      <button class="menu__btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menuPanel">
-        Menu
+    <!-- Right-side scroll roadmap (Apple Dock-inspired) -->
+    <nav class="roadmap" data-roadmap aria-label="Roadmap">
+      <button class="roadmap__item" type="button" data-roadmap-jump="home">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Home</span>
       </button>
-      <div class="menu__panel" id="menuPanel" data-menu-panel hidden>
-        <button class="menu__item" type="button" data-jump="home">Home</button>
-        <div class="menu__sep" aria-hidden="true"></div>
-        <button class="menu__item" type="button" data-jump="overview-1">Overview</button>
-        <button class="menu__item" type="button" data-jump="imperative">The Imperative</button>
-        <button class="menu__item" type="button" data-jump="approach">Approach &amp; Synopsis</button>
-        <button class="menu__item" type="button" data-jump="episodes">Episodes</button>
-        <button class="menu__item" type="button" data-jump="contact">Contact</button>
-      </div>
-    </div>
+      <button class="roadmap__item" type="button" data-roadmap-jump="overview-1">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Overview I</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="overview-2">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Overview II</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="overview-3">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Overview III</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="imperative">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Imperative</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="approach">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Approach</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="episodes">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Episodes</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="contact">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Contact</span>
+      </button>
+    </nav>
 
     <div class="intro" data-intro>
       <div class="intro__frame" role="group" aria-label="Opening quote">
@@ -342,7 +363,7 @@
               We’re seeking <strong>$500,000</strong> to bring this project to the screen.
             </p>
             <p>
-              If you’re interested in learning more, we’d love to share the deck, timeline, and production plan.
+              If you’re interested in learning more, we’d love to share the timeline and production plan.
             </p>
           </div>
           <div class="card__actions">

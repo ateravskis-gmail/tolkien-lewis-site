@@ -3,6 +3,10 @@
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isCoarsePointer =
+    window.matchMedia?.("(pointer: coarse)").matches ||
+    window.matchMedia?.("(hover: none)").matches ||
+    "ontouchstart" in window;
 
   const intro = qs("[data-intro]");
   const skipBtn = qs("[data-skip]");
@@ -13,15 +17,15 @@
   const addisonVideo = qs("[data-addison]");
   const trailerCursor = qs("[data-trailer-cursor]");
   const trailerTimeEl = qs("[data-trailer-time]");
+  const trailerTipEl = qs(".trailer-cursor__tip");
   const bgEls = qsa(".bg-slides [data-bg]");
   const bgByScene = new Map(bgEls.map((el) => [el.getAttribute("data-bg"), el]));
   const bgSlidesWrap = qs(".bg-slides");
   const titleLayer = qs('[data-layer="title"]');
   const scrollspace = qs("[data-scrollspace]");
   const epCards = qsa(".epCard");
-  const menuToggle = qs("[data-menu-toggle]");
-  const menuPanel = qs("[data-menu-panel]");
-  const menuJumpBtns = qsa("[data-jump]");
+  const roadmap = qs("[data-roadmap]");
+  const roadmapJumpBtns = qsa("[data-roadmap-jump]");
   const sceneEls = qsa("[data-scene]");
   const sceneDefs = [];
   for (const el of sceneEls) {
@@ -54,6 +58,7 @@
   let hoverEp = null;
   let uiDirty = true;
   let sceneStartByName = new Map();
+  let activeRoadmapScene = null;
 
   // --- small math helpers
   const clamp01 = (n) => Math.max(0, Math.min(1, n));
@@ -160,6 +165,31 @@
     if (p && typeof p.catch === "function") p.catch(() => {});
   }
 
+  function onFirstUserGesture(fn, { signal } = {}) {
+    // iOS/Safari can be finicky with "click" on <video>. Use pointer/touch in capture phase.
+    // Ensure we only run once even if multiple event types fire (touchstart -> click).
+    let fired = false;
+    const once = (e) => {
+      if (fired) return;
+      if (!e?.isTrusted) return;
+      fired = true;
+      fn(e);
+    };
+
+    const opts = (extra = {}) => ({ capture: true, passive: true, signal, ...extra });
+    window.addEventListener("pointerdown", once, opts());
+    window.addEventListener("touchstart", once, opts());
+    window.addEventListener("click", once, opts());
+    window.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key !== "Escape" && e.key !== "Enter" && e.key !== " ") return;
+        once(e);
+      },
+      { capture: true, signal },
+    );
+  }
+
   function fmtTime(sec) {
     if (!Number.isFinite(sec) || sec < 0) return "--:--";
     const m = Math.floor(sec / 60);
@@ -211,6 +241,7 @@
     lastP = p;
     uiDirty = false;
     const isHomePhase = p < overviewStart + enterThreshold;
+    if (window.scrollY > 18) document.body.classList.add("has-scrolled");
 
     // Home title should ONLY exist at the very start (not behind the overview panels).
     // Fade it out as soon as you begin entering the story.
@@ -303,6 +334,25 @@
       const ty = drift * 10;
       const sc = 1.03 + Math.abs(drift) * 0.015;
       activeBg.style.transform = `translate3d(0, ${ty}px, 0) scale(${sc})`;
+    }
+
+    // Roadmap active scene (right-side dock)
+    if (roadmap) {
+      let sceneName = "home";
+      if (!isHomePhase) {
+        const r = ranges.find((rr) => p >= rr.start && p < rr.end) || ranges[ranges.length - 1];
+        sceneName = r?.el?.getAttribute?.("data-scene") || "home";
+      }
+      if (sceneName !== activeRoadmapScene) {
+        activeRoadmapScene = sceneName;
+        const btns = roadmapJumpBtns.length ? roadmapJumpBtns : qsa("[data-roadmap-jump]");
+        for (const b of btns) {
+          const isActive = (b.getAttribute("data-roadmap-jump") || "home") === sceneName;
+          b.classList.toggle("is-active", isActive);
+          if (isActive) b.setAttribute("aria-current", "location");
+          else b.removeAttribute("aria-current");
+        }
+      }
     }
   }
 
@@ -440,8 +490,8 @@
       requestAnimationFrame(render);
     };
 
-    // Click anywhere to skip.
-    window.addEventListener("click", finish, { once: true, signal });
+    // Tap/click anywhere to skip (mobile-friendly).
+    onFirstUserGesture(finish, { signal });
 
     addisonVideo.loop = false;
     addisonVideo.muted = false;
@@ -519,40 +569,14 @@
       );
     }
 
-    // Click anywhere to skip.
-    const onSkipClick = () => {
+    // Tap/click anywhere to skip (mobile-friendly).
+    const onSkip = () => {
       if (!skipArmed) return;
-      window.removeEventListener("click", onSkipClick);
       cleanupTrailerScene();
       enterHome({ instant: true });
     };
-    window.addEventListener("click", onSkipClick, { signal });
+    onFirstUserGesture(onSkip, { signal });
   }
-
-  // --- Menu
-  function setMenuOpen(open) {
-    if (!menuToggle || !menuPanel) return;
-    menuToggle.setAttribute("aria-expanded", String(open));
-    menuPanel.hidden = !open;
-  }
-
-  menuToggle?.addEventListener("click", () => {
-    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
-    setMenuOpen(!isOpen);
-  });
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") setMenuOpen(false);
-  });
-
-  // Close when clicking outside the panel.
-  window.addEventListener("click", (e) => {
-    if (!menuPanel || menuPanel.hidden) return;
-    const t = e.target;
-    if (!(t instanceof Element)) return;
-    if (menuPanel.contains(t) || menuToggle?.contains(t)) return;
-    setMenuOpen(false);
-  });
 
   function jumpTo(scene) {
     if (mode !== "home") return;
@@ -563,8 +587,18 @@
       // Jump to just after trigger point so the interstitial runs.
       targetP = addisonTriggerAt + 0.001;
     } else {
-      const start = sceneStartByName.get(scene);
-      if (start != null) targetP = start + 0.002;
+      // Jump *into* the scene (past fade-in) so the target panel is fully visible
+      // rather than landing on the black/transition edge.
+      const r = ranges.find((rr) => rr.el?.getAttribute?.("data-scene") === scene);
+      if (r) {
+        const span = Math.max(0.0001, r.end - r.start);
+        const fade = (prefersReduced ? span * 0.10 : span * 0.18);
+        const bump = Math.min(span * 0.35, fade * 1.05, 0.03);
+        targetP = Math.min(r.end - 0.001, r.start + bump);
+      } else {
+        const start = sceneStartByName.get(scene);
+        if (start != null) targetP = start + 0.01;
+      }
     }
 
     if (targetP == null) return;
@@ -577,14 +611,35 @@
     setProgress(targetP);
     lastP = -1;
     uiDirty = true;
-    setMenuOpen(false);
     requestAnimationFrame(render);
   }
 
-  for (const b of menuJumpBtns) {
+  for (const b of roadmapJumpBtns) {
     b.addEventListener("click", () => {
-      const scene = b.getAttribute("data-jump") || "home";
+      const scene = b.getAttribute("data-roadmap-jump") || "home";
       jumpTo(scene);
+      // Clicking focuses the button; that keeps :focus-within on the dock, so labels stay open.
+      // Blur on pointer/click so labels collapse again (keyboard users still get focus behavior).
+      b.blur?.();
+    });
+  }
+
+  // Apple Dock-ish magnify on pointer move (desktop only, reduced-motion safe).
+  if (roadmap && !prefersReduced && !isCoarsePointer) {
+    const items = roadmapJumpBtns.length ? roadmapJumpBtns : qsa("[data-roadmap-jump]", roadmap);
+    const reset = () => items.forEach((el) => el.style.setProperty("--mag", "1"));
+    roadmap.addEventListener("pointerleave", reset);
+    roadmap.addEventListener("pointermove", (e) => {
+      const y = e.clientY;
+      const sigma = 62; // px
+      for (const el of items) {
+        const r = el.getBoundingClientRect();
+        const cy = r.top + r.height / 2;
+        const d = Math.abs(y - cy);
+        const bump = Math.exp(-(d * d) / (2 * sigma * sigma)); // 0..1
+        const mag = 1 + bump * 0.72;
+        el.style.setProperty("--mag", mag.toFixed(3));
+      }
     });
   }
 
@@ -675,6 +730,9 @@
   bindSkip();
   // Render once so the initial layer states are consistent (even before entering).
   scheduleRender();
+
+  // UI copy tweaks for touch devices.
+  if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
 })();
 
 

@@ -30,6 +30,9 @@ body{
   text-rendering: optimizeLegibility;
   font-size: 18px;
 }
+/* Improve tap responsiveness on mobile without interfering with scrolling. */
+html, body{touch-action: manipulation}
+*{-webkit-tap-highlight-color: transparent}
 /* Keep scrolling available but remove “webpage scrollbar” cues (supports the fixed-stage illusion). */
 body{scrollbar-width:none}
 body::-webkit-scrollbar{width:0; height:0}
@@ -40,62 +43,103 @@ body.is-trailer{overflow:hidden}
 body.is-addison{overflow:hidden}
 
 /* Hide nav during intro/trailer/interstitial */
-body:not(.is-entered) .menu{display:none}
-body.is-trailer .menu{display:none}
-body.is-addison .menu{display:none}
+body:not(.is-entered) .roadmap{display:none}
+body.is-trailer .roadmap{display:none}
+body.is-addison .roadmap{display:none}
 
-.menu{
-  position:fixed;
-  left: 18px;
-  top: 18px;
-  z-index: 90;
-}
-.menu__btn{
-  appearance:none;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.28);
-  color: rgba(255,255,255,.86);
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-family: var(--font-title);
-  letter-spacing:.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 11px;
-  cursor:pointer;
-  box-shadow: 0 22px 80px rgba(0,0,0,.55);
-  backdrop-filter: blur(8px);
-}
-.menu__btn:hover{background: rgba(0,0,0,.36); border-color: rgba(255,255,255,.26)}
-.menu__panel{
-  margin-top: 10px;
-  width: min(320px, calc(100vw - 36px));
-  border-radius: 18px;
+/* --- Roadmap dock (right-side scroll assist) */
+.roadmap{
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+  z-index: 89;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 999px;
   border: 1px solid rgba(255,255,255,.16);
   background:
-    radial-gradient(700px 260px at 20% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.62));
+    radial-gradient(520px 220px at 0% 0%, rgba(255,255,255,.06), transparent 62%),
+    linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.44));
   box-shadow: 0 34px 120px rgba(0,0,0,.65);
-  padding: 10px;
+  backdrop-filter: blur(10px);
 }
-.menu__item{
-  width:100%;
-  text-align:left;
-  appearance:none;
+.roadmap__item{
+  --mag: 1;
+  appearance: none;
   border: 0;
   background: transparent;
-  color: rgba(255,255,255,.90);
-  padding: 12px 12px;
-  border-radius: 14px;
-  font-family: var(--font-body);
-  font-size: 16px;
-  cursor:pointer;
+  color: rgba(255,255,255,.84);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transform: translate3d(0,0,0) scale(var(--mag));
+  transform-origin: right center;
+  transition: transform .14s ease, background .14s ease;
+  will-change: transform;
 }
-.menu__item:hover{background: rgba(255,255,255,.08)}
-.menu__sep{
-  height:1px;
-  background: rgba(255,255,255,.10);
-  margin: 6px 10px;
+.roadmap:not(:hover):not(:focus-within) .roadmap__item{
+  justify-content: center;
+  gap: 0;
+  padding-inline: 8px;
+}
+.roadmap__item:hover{background: rgba(255,255,255,.08)}
+.roadmap__item:focus-visible{
+  outline: 2px solid rgba(255,255,255,.42);
+  outline-offset: 2px;
+}
+.roadmap__dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.22);
+  box-shadow: 0 10px 28px rgba(0,0,0,.42);
+}
+.roadmap__item.is-active{background: rgba(255,255,255,.10)}
+.roadmap__item.is-active .roadmap__dot{background: rgba(255,255,255,.92)}
+.roadmap__label{
+  font-family: var(--font-title);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 720;
+  font-size: 10px;
+  color: rgba(255,255,255,.78);
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: translate3d(8px, 0, 0);
+  transition: opacity .18s ease, transform .18s ease, max-width .18s ease;
+}
+.roadmap:hover .roadmap__label,
+.roadmap:focus-within .roadmap__label{
+  opacity: 1;
+  max-width: 180px;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Initial “there’s more” cue until the user scrolls */
+@keyframes roadmapPulse{
+  0%, 100%{transform: scale(1); opacity: .9}
+  50%{transform: scale(1.35); opacity: 1}
+}
+body:not(.has-scrolled) .roadmap__item[data-roadmap-jump="overview-1"] .roadmap__dot{
+  animation: roadmapPulse 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce){
+  body:not(.has-scrolled) .roadmap__item[data-roadmap-jump="overview-1"] .roadmap__dot{
+    animation: none;
+  }
+}
+
+@media (max-width: 980px){
+  /* On smaller screens, the dock can crowd the cinematic layout; keep the menu instead. */
+  .roadmap{display:none}
 }
 
 button{font-family: inherit}
@@ -197,6 +241,10 @@ button{font-family: inherit}
   position:fixed;
   inset:0;
   overflow:hidden;
+  /* Mobile browser UI can change viewport height; prefer dynamic units when supported. */
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
 }
 .scrollspace{
   height: 520vh; /* controls how “long” the story feels */
@@ -275,6 +323,7 @@ button{font-family: inherit}
 body.is-trailer .stage__trailer{
   opacity: 1;
   pointer-events:auto;
+  touch-action: manipulation;
 }
 body.is-trailer .stage__video{
   opacity: 0;
@@ -344,6 +393,7 @@ body.is-addison .trailer-cursor{display:block}
 body.is-addison .stage__interstitial{
   opacity:1;
   pointer-events:auto;
+  touch-action: manipulation;
 }
 
 .stage__vignette{
@@ -500,9 +550,60 @@ body.is-addison .stage__interstitial{
 .epCard__body{scrollbar-width: thin}
 
 @media (max-width: 980px){
-  .episodesDock{grid-template-columns: 1fr; gap: 10px; bottom: 16px}
-  .epCard{min-height: 70px}
+  /* Episodes: switch to swipeable horizontal dock on small screens */
+  .episodesDock{
+    display:flex;
+    gap: 12px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 18px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .episodesDock::-webkit-scrollbar{height:0}
+  .episodesDock{scrollbar-width:none}
+
+  .epCard{
+    flex: 0 0 min(82vw, 440px);
+    scroll-snap-align: start;
+    min-height: 72px;
+    max-height: 52vh;
+  }
   .epCard.is-active, .epCard:hover{transform:none}
+  .epCard.is-active .epCard__body,
+  .epCard:hover .epCard__body{
+    max-height: clamp(220px, 30vh, 360px);
+  }
+}
+
+/* Trailer/Addison: show a static "Tap to Skip" hint on touch devices (cursor UI is mouse-driven). */
+@media (hover: none), (pointer: coarse){
+  body.is-trailer, body.is-addison{cursor:auto}
+
+  body.is-trailer .trailer-cursor,
+  body.is-addison .trailer-cursor{
+    left: 50%;
+    top: auto;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translate3d(-50%, 0, 0);
+    mix-blend-mode: normal;
+    opacity: .92;
+  }
+  .trailer-cursor__time{display:none}
+  .trailer-cursor__tip{
+    margin-top: 0;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(0,0,0,.42);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Safe-area nudge for the menu button on notched devices */
 }
 
 /* Title layout: more side padding + better readability over video */
@@ -612,6 +713,19 @@ body.is-home .overlay__titleLine--b{
 .card--panel{
   width:min(980px, 100%);
   padding: clamp(22px, 2.2vw, 30px);
+}
+
+/* Subtle readability boost on the busiest backgrounds (keep it understated). */
+@supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
+  .overlay[data-scene="overview-3"] .card--panel,
+  .overlay[data-scene="imperative"] .card--panel{
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    /* Nudge background slightly darker so the blur reads as "clarity" not "glass." */
+    background:
+      radial-gradient(900px 320px at 20% 0%, rgba(255,255,255,.06), transparent 60%),
+      rgba(8,8,9,.66);
+  }
 }
 
 /* Reusable in-card scroll prompt */
