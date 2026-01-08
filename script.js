@@ -527,34 +527,43 @@
     // Mobile browsers (especially iOS Safari) will not autoplay unmuted video without a user gesture.
     // So on touch/coarse pointers: first tap starts playback with audio; subsequent tap skips.
     let started = false;
+    let skipArmedLocal = false;
+    const armSkip = () => {
+      skipArmedLocal = false;
+      window.setTimeout(() => {
+        skipArmedLocal = true;
+      }, 450);
+    };
+
     const startPlayback = () => {
+      if (started) return;
       started = true;
+      armSkip();
       if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
-      tryPlay(addisonVideo);
+      const p = addisonVideo.play?.();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          // If the browser still blocks playback, allow the user to try again.
+          started = false;
+          skipArmedLocal = false;
+          if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Play";
+        });
+      }
+    };
+
+    const onSkip = (e) => {
+      if (!e?.isTrusted) return;
+      if (!started) return;
+      if (!skipArmedLocal) return;
+      finish();
     };
 
     if (isCoarsePointer) {
       if (trailerTipEl) trailerTipEl.textContent = "Tap to Play";
-      // First gesture starts playback; next gesture skips.
+      // First gesture starts playback; next gesture (after a short delay) skips.
       onFirstUserGesture(startPlayback, { signal });
-      window.addEventListener(
-        "pointerdown",
-        (e) => {
-          if (!e?.isTrusted) return;
-          if (!started) return;
-          finish();
-        },
-        { capture: true, passive: true, signal },
-      );
-      window.addEventListener(
-        "touchstart",
-        (e) => {
-          if (!e?.isTrusted) return;
-          if (!started) return;
-          finish();
-        },
-        { capture: true, passive: true, signal },
-      );
+      window.addEventListener("pointerdown", onSkip, { capture: true, passive: true, signal });
+      window.addEventListener("touchstart", onSkip, { capture: true, passive: true, signal });
     } else {
       // Desktop: try to autoplay with audio; click/tap skips.
       tryPlay(addisonVideo);

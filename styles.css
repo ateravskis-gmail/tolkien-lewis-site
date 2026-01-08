@@ -644,8 +644,8 @@ body.is-addison .stage__interstitial{
   .portraits{
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    max-width: 30%;
-    margin-top: 8px;
+    max-width: 22%;
+    margin-top: 6px;
   }
   .portrait{border-radius: 12px}
   .portrait img{
@@ -654,9 +654,9 @@ body.is-addison .stage__interstitial{
   }
   .portraits .portrait:nth-child(2) img{object-position: 50% 24%}
   .portrait figcaption{
-    padding: 7px 8px 8px;
-    font-size: 8px;
-    letter-spacing: .14em;
+    padding: 6px 7px 7px;
+    font-size: 7px;
+    letter-spacing: .12em;
   }
 
   /* Imperative: tighten a bit further (this panel is text-heavy). */
