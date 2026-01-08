@@ -586,7 +586,33 @@ body.is-addison .stage__interstitial{
   }
 }
 
-/* --- Mobile readability mode + Episodes accordion */
+/* Episodes: selected episode panel + filmstrip (hidden by default; enabled on touch/small screens) */
+.epSelected{
+  display:none;
+  pointer-events:none;
+  position:absolute;
+  left:0;
+  right:0;
+  top: clamp(14px, 4vh, 38px);
+  place-items:center;
+  padding: 0 12px;
+  z-index: 35;
+}
+.epFilmstrip{
+  display:none;
+  pointer-events:auto;
+  position:absolute;
+  left:0;
+  right:0;
+  /* Keep above iOS Safari bottom bar */
+  bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  justify-content:center;
+  gap: 10px;
+  padding: 0 12px;
+  z-index: 36;
+}
+
+/* --- Mobile readability mode + Episodes filmstrip */
 @media (max-width: 720px){
   /* Shrink typography/padding so each panel fits a phone viewport more reliably. */
   body{font-size: 14px}
@@ -618,7 +644,7 @@ body.is-addison .stage__interstitial{
   .portraits{
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    max-width: 38%;
+    max-width: 30%;
     margin-top: 8px;
   }
   .portrait{border-radius: 12px}
@@ -650,7 +676,7 @@ body.is-addison .stage__interstitial{
   /* Episodes: mobile filmstrip picker + selected episode display */
   .episodesTop{display:none}
   .episodesDock{display:none}
-  .epSelected{display:block}
+  .epSelected{display:grid}
   .epFilmstrip{display:flex}
 }
 
@@ -658,21 +684,8 @@ body.is-addison .stage__interstitial{
 @media (hover: none), (pointer: coarse){
   .episodesTop{display:none}
   .episodesDock{display:none}
-  .epSelected{display:block}
+  .epSelected{display:grid}
   .epFilmstrip{display:flex}
-}
-
-/* Episodes (mobile-only elements are hidden by default) */
-.epSelected{display:none; pointer-events:none}
-.epFilmstrip{display:none; pointer-events:auto}
-.epSelected{
-  position:absolute;
-  left:0;
-  right:0;
-  top: clamp(14px, 4vh, 38px);
-  display:grid;
-  place-items:center;
-  padding: 0 12px;
 }
 .epSelected__card{
   width:min(980px, 100%);
@@ -697,15 +710,6 @@ body.is-addison .stage__interstitial{
   font-size: 14px;
   line-height: 1.48;
   color: rgba(255,255,255,.82);
-}
-.epFilmstrip{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  justify-content:center;
-  gap: 10px;
-  padding: 0 12px;
 }
 .epChip{
   appearance:none;
