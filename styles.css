@@ -589,76 +589,138 @@ body.is-addison .stage__interstitial{
 /* --- Mobile readability mode + Episodes accordion */
 @media (max-width: 720px){
   /* Shrink typography/padding so each panel fits a phone viewport more reliably. */
-  body{font-size: 15px}
-  .overlay{padding: 16px}
-  .card{padding: 16px 16px 14px}
-  .card--panel{padding: 18px}
+  body{font-size: 14px}
+  .overlay{padding: 12px}
+  .card{padding: 14px 14px 12px}
+  .card--panel{padding: 16px}
   .card__label{margin-bottom: 8px}
   .prose p{
-    margin: 0 0 10px;
-    font-size: 15px;
-    line-height: 1.52;
-  }
-  .prose .lead{
-    font-size: 16px;
+    margin: 0 0 9px;
+    font-size: 14px;
     line-height: 1.48;
   }
+  .prose .lead{
+    font-size: 15px;
+    line-height: 1.42;
+  }
   .callout--dark{
-    margin-top: 14px;
-    padding: 18px 16px 16px;
+    margin-top: 12px;
+    padding: 16px 14px 14px;
   }
   .callout--dark .callout__text{
-    font-size: 16px;
-    line-height: 1.44;
+    font-size: 15px;
+    line-height: 1.40;
   }
   .facts--dark .fact{padding: 10px 12px}
   .facts--dark .fact__v{font-size: 14px}
 
-  /* Episodes: vertical accordion stack (more navigable than horizontal swiping). */
-  .overlay--episodes{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  /* Overview portraits: keep them much smaller on phones to preserve vertical space. */
+  .portraits{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-width: 52%;
+    margin-top: 10px;
   }
-  .episodesTop{
-    position:relative;
-    top:auto;
-    left:auto;
-    right:auto;
-    padding: 0;
-    width: min(980px, 100%);
+  .portrait{border-radius: 14px}
+  .portrait img{
+    aspect-ratio: 1 / 1;
+    object-position: 50% 38%;
   }
-  .episodesDock{
-    position:relative;
-    left:auto;
-    right:auto;
-    bottom:auto;
-    width: min(980px, 100%);
-    display:flex;
-    flex-direction:column;
-    gap: 10px;
-    padding: 12px 0 0;
-    overflow: visible;
+  .portraits .portrait:nth-child(2) img{object-position: 50% 24%}
+  .portrait figcaption{
+    padding: 8px 10px 9px;
+    font-size: 9px;
+    letter-spacing: .16em;
   }
-  .epCard{
-    flex: none;
-    width: 100%;
-    min-height: 64px;
-    padding: 14px 14px 12px;
-  }
-  .epCard__tag{font-size: 10px}
-  .epCard__title{font-size: 12px}
-  .epCard__years{font-size: 11px}
-  .epCard__body{
+
+  /* Imperative: tighten a bit further (this panel is text-heavy). */
+  .overlay[data-scene="imperative"] .prose .lead{
     font-size: 14px;
-    line-height: 1.48;
+    line-height: 1.38;
   }
-  .epCard.is-active .epCard__body,
-  .epCard:hover .epCard__body{
-    max-height: 2200px;
+  .overlay[data-scene="imperative"] .callout--dark{
+    margin-top: 10px;
+    padding-top: 36px;
   }
+  .overlay[data-scene="imperative"] .callout--dark .callout__text{
+    font-size: 14px;
+    line-height: 1.36;
+  }
+
+  /* Episodes: mobile filmstrip picker + selected episode display */
+  .episodesTop{display:none}
+  .episodesDock{display:none}
+  .epSelected{display:block}
+  .epFilmstrip{display:flex}
+}
+
+/* Episodes (mobile-only elements are hidden by default) */
+.epSelected{display:none; pointer-events:none}
+.epFilmstrip{display:none; pointer-events:auto}
+.epSelected{
+  position:absolute;
+  left:0;
+  right:0;
+  top: clamp(14px, 4vh, 38px);
+  display:grid;
+  place-items:center;
+  padding: 0 12px;
+}
+.epSelected__card{
+  width:min(980px, 100%);
+}
+.epSelected__title{
+  margin-top: 8px;
+  font-family: var(--font-title);
+  font-weight: 760;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-size: 14px;
+  line-height: 1.18;
+  color: rgba(255,255,255,.94);
+}
+.epSelected__years{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+.epSelected__body{
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.48;
+  color: rgba(255,255,255,.82);
+}
+.epFilmstrip{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  justify-content:center;
+  gap: 10px;
+  padding: 0 12px;
+}
+.epChip{
+  appearance:none;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.86);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-family: var(--font-title);
+  letter-spacing:.20em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: 10px;
+  cursor:pointer;
+}
+.epChip.is-active{
+  border-color: rgba(255,255,255,.32);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.94);
+}
+.epChip:focus-visible{
+  outline: 2px solid rgba(255,255,255,.42);
+  outline-offset: 2px;
 }
 
 /* Trailer/Addison: show a static "Tap to Skip" hint on touch devices (cursor UI is mouse-driven). */

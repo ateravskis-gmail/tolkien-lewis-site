@@ -288,6 +288,23 @@
           </div>
         </div>
 
+        <!-- Mobile: selected episode panel + filmstrip chooser -->
+        <div class="epSelected" data-ep-selected aria-label="Selected episode">
+          <div class="card card--panel epSelected__card">
+            <div class="card__label" data-ep-selected-tag>Episode</div>
+            <div class="epSelected__title" data-ep-selected-title></div>
+            <div class="epSelected__years" data-ep-selected-years></div>
+            <div class="epSelected__body" data-ep-selected-body></div>
+          </div>
+        </div>
+        <nav class="epFilmstrip" aria-label="Episode chooser">
+          <button class="epChip" type="button" data-ep-chip="1">EP1</button>
+          <button class="epChip" type="button" data-ep-chip="2">EP2</button>
+          <button class="epChip" type="button" data-ep-chip="3">EP3</button>
+          <button class="epChip" type="button" data-ep-chip="4">EP4</button>
+          <button class="epChip" type="button" data-ep-chip="5">EP5</button>
+        </nav>
+
         <nav class="episodesDock" aria-label="Episodes">
           <button class="epCard" type="button" data-ep="1">
             <div class="epCard__tag">EPISODE 1</div>

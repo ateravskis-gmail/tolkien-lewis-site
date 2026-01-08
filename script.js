@@ -26,6 +26,12 @@
   const epCards = qsa(".epCard");
   const roadmap = qs("[data-roadmap]");
   const roadmapJumpBtns = qsa("[data-roadmap-jump]");
+  const epChips = qsa("[data-ep-chip]");
+  const epSelected = qs("[data-ep-selected]");
+  const epSelectedTag = qs("[data-ep-selected-tag]");
+  const epSelectedTitle = qs("[data-ep-selected-title]");
+  const epSelectedYears = qs("[data-ep-selected-years]");
+  const epSelectedBody = qs("[data-ep-selected-body]");
   const sceneEls = qsa("[data-scene]");
   const sceneDefs = [];
   for (const el of sceneEls) {
@@ -305,6 +311,28 @@
         card.classList.toggle("is-active", isActive);
       }
 
+      // Mobile episodes: render selected episode into the dedicated panel + highlight chips.
+      if (inEp && epSelected && epSelectedTitle && epSelectedBody) {
+        const src = epCards.find((c) => c.getAttribute("data-ep") === selectedEp);
+        if (src) {
+          const tag = qs(".epCard__tag", src)?.textContent?.trim() || `EPISODE ${selectedEp}`;
+          const title = qs(".epCard__title", src)?.textContent?.trim() || "";
+          const years = qs(".epCard__years", src)?.textContent?.trim() || "";
+          const body = qs(".epCard__body", src)?.textContent?.trim() || "";
+          if (epSelectedTag) epSelectedTag.textContent = tag;
+          epSelectedTitle.textContent = title;
+          if (epSelectedYears) epSelectedYears.textContent = years;
+          epSelectedBody.textContent = body;
+        }
+        for (const chip of epChips) {
+          const ep = chip.getAttribute("data-ep-chip") || "1";
+          const isOn = ep === selectedEp;
+          chip.classList.toggle("is-active", isOn);
+          if (isOn) chip.setAttribute("aria-current", "true");
+          else chip.removeAttribute("aria-current");
+        }
+      }
+
       // Ensure the background layer is visible during Episodes (ep backgrounds are not timeline scenes).
       if (inEp) {
         if (bgSlidesWrap) bgSlidesWrap.style.opacity = "1";
@@ -494,10 +522,19 @@
     onFirstUserGesture(finish, { signal });
 
     addisonVideo.loop = false;
-    addisonVideo.muted = false;
+    // Mobile Safari blocks unmuted autoplay when this is triggered by scroll/timeline.
+    // Prefer muted autoplay on coarse pointers, so the interstitial actually plays.
+    addisonVideo.muted = isCoarsePointer;
+    if (isCoarsePointer) addisonVideo.volume = 0;
     addisonVideo.currentTime = 0;
     setCursorForVideo(addisonVideo);
-    tryPlay(addisonVideo);
+    const playP = addisonVideo.play?.();
+    if (playP && typeof playP.catch === "function") {
+      playP.catch(() => {
+        // If autoplay is blocked, don't leave the user on a black screen—skip forward.
+        window.setTimeout(finish, 0);
+      });
+    }
     addisonVideo.addEventListener("loadedmetadata", () => setCursorForVideo(addisonVideo), { once: true, signal });
     addisonVideo.addEventListener("timeupdate", () => setCursorForVideo(addisonVideo), { passive: true, signal });
     addisonVideo.addEventListener("ended", finish, { once: true, signal });
@@ -722,6 +759,16 @@
       selectedEp = ep;
       uiDirty = true;
       scheduleRender();
+    });
+  }
+
+  for (const chip of epChips) {
+    const ep = chip.getAttribute("data-ep-chip") || "1";
+    chip.addEventListener("click", () => {
+      selectedEp = ep;
+      uiDirty = true;
+      scheduleRender();
+      chip.blur?.();
     });
   }
 
