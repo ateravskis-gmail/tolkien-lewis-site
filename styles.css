@@ -41,6 +41,8 @@ body::-webkit-scrollbar{width:0; height:0}
 body:not(.is-entered){overflow:hidden}
 body.is-trailer{overflow:hidden}
 body.is-addison{overflow:hidden}
+/* Prevent swipe-to-skip gestures from also scrolling into the next scene. */
+body.is-skip-lock{overflow:hidden}
 
 /* Hide nav during intro/trailer/interstitial */
 body:not(.is-entered) .roadmap{display:none}

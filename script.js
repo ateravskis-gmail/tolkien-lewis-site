@@ -77,6 +77,15 @@
   let touchStart = null;
   let touchLast = null;
   let scrollAC = null;
+  let skipLockTimer = 0;
+
+  function applySkipLock(ms) {
+    window.clearTimeout(skipLockTimer);
+    document.body.classList.add("is-skip-lock");
+    skipLockTimer = window.setTimeout(() => {
+      document.body.classList.remove("is-skip-lock");
+    }, ms);
+  }
 
   // --- small math helpers
   const clamp01 = (n) => Math.max(0, Math.min(1, n));
@@ -637,7 +646,7 @@
     unbindScrollSnapping();
   }
 
-  function enterHome({ instant = false } = {}) {
+  function enterHome({ instant = false, suppressSnapMs = 0 } = {}) {
     if (mode === "home") return;
     mode = "home";
     entered = true;
@@ -663,7 +672,14 @@
     buildRanges();
     addisonPlayed = false;
     episodesInitialized = false;
-    bindScrollSnapping();
+    if (suppressSnapMs > 0 && isCoarsePointer) {
+      applySkipLock(suppressSnapMs);
+      window.setTimeout(() => {
+        bindScrollSnapping();
+      }, suppressSnapMs);
+    } else {
+      bindScrollSnapping();
+    }
     if (addisonVideo) {
       addisonVideo.pause?.();
       addisonVideo.currentTime = 0;
@@ -743,14 +759,22 @@
     window.addEventListener("mousemove", onMouseMove, { passive: true, signal });
     startCursorLoop();
 
-    const finish = () => {
+    const finish = (opts = {}) => {
+      const fromGesture = opts === true || opts?.fromGesture === true;
       cleanupAddisonScene();
       mode = "home";
       entered = true;
       document.body.classList.add("is-home");
       window.addEventListener("scroll", scheduleRender, { passive: true });
       window.addEventListener("resize", scheduleRender);
-      bindScrollSnapping();
+      if (fromGesture && isCoarsePointer) {
+        applySkipLock(450);
+        window.setTimeout(() => {
+          bindScrollSnapping();
+        }, 450);
+      } else {
+        bindScrollSnapping();
+      }
       // Jump to imperative start and immediately render the card (avoid any black "gap").
       // Jump *into* the imperative range (past fade-in) so it's visible instantly.
       const span = imperativeRange.end - imperativeRange.start;
@@ -763,14 +787,16 @@
     };
 
     addisonVideo.loop = false;
-    addisonVideo.muted = false;
-    addisonVideo.volume = 1;
+    // Start muted by default; we'll attempt to enable audio on a user gesture.
+    addisonVideo.muted = true;
+    addisonVideo.volume = 0;
     addisonVideo.currentTime = 0;
     setCursorForVideo(addisonVideo);
 
-    // Mobile browsers (especially iOS Safari) will not autoplay unmuted video without a user gesture.
-    // So on touch/coarse pointers: first tap starts playback with audio; subsequent tap skips.
+    // Mobile browsers (especially iOS Safari) will not autoplay *unmuted* video without a user gesture.
+    // To avoid stalling on a black frame, autoplay muted immediately, then use the first tap to enable audio.
     let started = false;
+    let hasAudio = false;
     let skipArmedLocal = false;
     const armSkip = () => {
       skipArmedLocal = false;
@@ -779,11 +805,46 @@
       }, 450);
     };
 
-    const startPlayback = () => {
+    const startMutedAutoplay = () => {
+      if (started) return;
+      started = true;
+      // Ensure muted autoplay is allowed.
+      addisonVideo.muted = true;
+      addisonVideo.volume = 0;
+      addisonVideo.setAttribute("muted", "");
+      tryPlay(addisonVideo);
+      armSkip();
+      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
+    };
+
+    const enableAudio = () => {
+      if (!started) return;
+      if (hasAudio) return;
+      // Attempt to unmute within a user-gesture handler.
+      addisonVideo.muted = false;
+      addisonVideo.volume = 1;
+      const p = addisonVideo.play?.();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          // If the browser still blocks audio, stay muted.
+          addisonVideo.muted = true;
+          addisonVideo.volume = 0;
+          hasAudio = false;
+          if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
+        });
+      }
+      hasAudio = true;
+      armSkip();
+      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
+    };
+
+    const startPlaybackWithAudio = () => {
       if (started) return;
       started = true;
       armSkip();
       if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
+      addisonVideo.muted = false;
+      addisonVideo.volume = 1;
       const p = addisonVideo.play?.();
       if (p && typeof p.catch === "function") {
         p.catch(() => {
@@ -793,19 +854,30 @@
           if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Play";
         });
       }
+      hasAudio = true;
     };
 
     const onSkip = (e) => {
       if (!e?.isTrusted) return;
       if (!started) return;
+      // If we're autoplaying muted, first tap should enable audio (not skip).
+      if (isCoarsePointer && !hasAudio) {
+        enableAudio();
+        return;
+      }
       if (!skipArmedLocal) return;
-      finish();
+      finish({ fromGesture: true });
     };
 
     if (isCoarsePointer) {
-      if (trailerTipEl) trailerTipEl.textContent = "Tap to Play";
-      // First gesture starts playback; next gesture (after a short delay) skips.
-      onFirstUserGesture(startPlayback, { signal });
+      // Autoplay muted immediately to avoid a black stall, then use tap to enable audio.
+      startMutedAutoplay();
+      if (trailerTipEl) trailerTipEl.textContent = "Tap for Sound";
+      // If autoplay failed for any reason, allow first gesture to start playback with audio.
+      onFirstUserGesture(() => {
+        if (!started) startPlaybackWithAudio();
+        else enableAudio();
+      }, { signal });
       window.addEventListener("pointerdown", onSkip, { capture: true, passive: true, signal });
       window.addEventListener("touchstart", onSkip, { capture: true, passive: true, signal });
     } else {
@@ -894,10 +966,13 @@
     }
 
     // Tap/click anywhere to skip (mobile-friendly).
-    const onSkip = () => {
+    const onSkip = (e) => {
       if (!skipArmed) return;
       cleanupTrailerScene();
-      enterHome({ instant: true });
+      // On touch devices, a swipe can register as both "gesture" and "scroll".
+      // Delay snap binding and keep scroll locked briefly so we don't skip + scroll past the next scene.
+      const suppressSnapMs = isCoarsePointer ? 450 : 0;
+      enterHome({ instant: true, suppressSnapMs });
     };
     onFirstUserGesture(onSkip, { signal });
   }
