@@ -174,7 +174,7 @@ button{font-family: inherit}
   letter-spacing: .22em;
   text-transform: uppercase;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   color: rgba(255,255,255,.55);
   opacity:0;
   transform: translate3d(0, 10px, 0);
@@ -492,9 +492,9 @@ body.is-addison .stage__interstitial{
   appearance:none;
   border: 1px solid rgba(255,255,255,.14);
   background:
-    radial-gradient(900px 260px at 20% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.50));
-  color: rgba(255,255,255,.90);
+    radial-gradient(900px 260px at 20% 0%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.74));
+  color: rgba(255,255,255,.96);
   border-radius: 18px;
   padding: 14px 14px 12px;
   text-align:left;
@@ -517,7 +517,8 @@ body.is-addison .stage__interstitial{
   text-transform: uppercase;
   font-weight: 700;
   font-size: 10px;
-  color: rgba(255,255,255,.70);
+  color: rgba(255,255,255,.90);
+  text-shadow: 0 10px 40px rgba(0,0,0,.60);
 }
 .epCard__title{
   margin-top: 8px;
@@ -527,18 +528,20 @@ body.is-addison .stage__interstitial{
   text-transform: uppercase;
   font-size: 13px;
   line-height: 1.18;
-  color: rgba(255,255,255,.92);
+  color: rgba(255,255,255,.99);
 }
 .epCard__years{
   margin-top: 6px;
   font-size: 12px;
-  color: rgba(255,255,255,.68);
+  color: rgba(255,255,255,.92);
+  text-shadow: 0 10px 46px rgba(0,0,0,.62);
 }
 .epCard__body{
   margin-top: 12px;
   font-size: clamp(16px, .5vw + 14px, 18px);
   line-height: 1.62;
-  color: rgba(255,255,255,.84);
+  color: rgba(255,255,255,.99);
+  text-shadow: 0 12px 54px rgba(0,0,0,.68);
   max-height: 0;
   opacity: 0;
   overflow:hidden;
@@ -626,16 +629,16 @@ body.is-addison .stage__interstitial{
     line-height: 1.48;
   }
   .prose .lead{
-    font-size: 15px;
-    line-height: 1.42;
+    font-size: 14px;
+    line-height: 1.48;
   }
   .callout--dark{
     margin-top: 12px;
     padding: 16px 14px 14px;
   }
   .callout--dark .callout__text{
-    font-size: 15px;
-    line-height: 1.40;
+    font-size: 14px;
+    line-height: 1.48;
   }
   .facts--dark .fact{padding: 10px 12px}
   .facts--dark .fact__v{font-size: 14px}
@@ -703,13 +706,15 @@ body.is-addison .stage__interstitial{
 .epSelected__years{
   margin-top: 6px;
   font-size: 12px;
-  color: rgba(255,255,255,.70);
+  color: rgba(255,255,255,.92);
+  text-shadow: 0 10px 46px rgba(0,0,0,.62);
 }
 .epSelected__body{
   margin-top: 10px;
   font-size: 14px;
   line-height: 1.48;
-  color: rgba(255,255,255,.82);
+  color: rgba(255,255,255,.96);
+  text-shadow: 0 12px 54px rgba(0,0,0,.68);
 }
 .epChip{
   appearance:none;
@@ -993,6 +998,63 @@ body.is-home .overlay__titleLine--b{
 .card__btn:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.24)}
 .card__actions{margin-top: 14px}
 
+/* Contact CTA: external links (glassmorphism pills) */
+.contactStack{
+  width: min(980px, 100%);
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events:auto;
+}
+.ctaLinks{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content:center;
+  pointer-events:auto;
+}
+.ctaPill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(900px 220px at 20% 0%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.74));
+  color: rgba(255,255,255,.92);
+  text-decoration:none;
+  font-family: var(--font-title);
+  letter-spacing: .2em;
+  text-transform: none;
+  font-weight: 650;
+  font-size: 11px;
+  box-shadow: 0 24px 90px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+}
+.ctaPill:hover{
+  background:
+    radial-gradient(900px 220px at 20% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.78));
+  border-color: rgba(255,255,255,.28);
+  color: rgba(255,255,255,.94);
+}
+.ctaPill:active{transform: translateY(1px)}
+.ctaPill:focus-visible{
+  outline: 2px solid rgba(255,255,255,.42);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px){
+  .ctaPill{
+    width: 100%;
+    justify-content:center;
+  }
+}
+
 .prose p{
   margin: 0 0 12px;
   font-size: clamp(18px, 1.15vw + 14px, 21px);
@@ -1003,6 +1065,15 @@ body.is-home .overlay__titleLine--b{
   font-size: clamp(20px, 1.25vw + 15px, 24px);
   line-height: 1.56;
   color: rgba(255,255,255,.88);
+}
+
+/* Keep primary copy size consistent across Overview + Imperative panels. */
+.overlay[data-scene="overview-1"] .prose .lead,
+.overlay[data-scene="overview-2"] .prose .lead,
+.overlay[data-scene="overview-3"] .prose .lead,
+.overlay[data-scene="imperative"] .prose .lead{
+  font-size: clamp(18px, 1.15vw + 14px, 21px);
+  line-height: 1.64;
 }
 
 .quote--dark{
@@ -1106,7 +1177,7 @@ body.is-home .overlay__titleLine--b{
   letter-spacing:.22em;
   text-transform:uppercase;
   font-size: 10px;
-  color: rgba(255,255,255,.55);
+  color: rgba(255,255,255);
 }
 .facts--dark .fact__v{
   font-weight:650;

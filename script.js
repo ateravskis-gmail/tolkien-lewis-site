@@ -65,6 +65,18 @@
   let uiDirty = true;
   let sceneStartByName = new Map();
   let activeRoadmapScene = null;
+  let firstBgRange = null;
+  let snapPoints = [];
+  let snapTargetIndex = 0;
+  let snapAnimating = false;
+  let snapRAF = 0;
+  let snapSettleTimer = 0;
+  let wheelAccum = 0;
+  let wheelResetTimer = 0;
+  let wheelLock = false;
+  let touchStart = null;
+  let touchLast = null;
+  let scrollAC = null;
 
   // --- small math helpers
   const clamp01 = (n) => Math.max(0, Math.min(1, n));
@@ -121,13 +133,17 @@
       if (name) sceneStartByName.set(name, r.start);
     }
 
+    rebuildSnapPoints();
+
     // Compute merged segments of scenes that have explicit backgrounds assigned.
+    firstBgRange = null;
     bgSegments = [];
     let cur = null;
     for (const r of ranges) {
       const name = r.el?.getAttribute?.("data-scene");
       if (!name) continue;
       if (!bgByScene.has(name)) continue;
+      if (!firstBgRange) firstBgRange = r;
       if (!cur) cur = { start: r.start, end: r.end };
       else if (Math.abs(cur.end - r.start) < 1e-6) cur.end = r.end;
       else {
@@ -163,6 +179,209 @@
   function setProgress(p) {
     const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     window.scrollTo({ top: clamp01(p) * max, behavior: "auto" });
+  }
+
+  function canSnapScroll() {
+    return mode === "home" && entered && !document.body.classList.contains("is-addison");
+  }
+
+  function snapPointForRange(r, scene) {
+    const span = Math.max(0.0001, r.end - r.start);
+    const fade = prefersReduced ? span * 0.1 : span * 0.18;
+    // Land past the fade-in window so the panel is fully visible at each stop.
+    // (Episodes is a longer scene; a hard cap here caused snapping before fade-in finished.)
+    const bump = Math.min(span * 0.35, fade * 1.25);
+    const extra = scene === "overview-1" ? Math.min(span * 0.22, 0.028) : 0;
+    return Math.min(r.end - 0.001, r.start + bump + extra);
+  }
+
+  function rebuildSnapPoints() {
+    snapPoints = [{ p: 0, scene: "home" }];
+    for (const r of ranges) {
+      const scene = r.el?.getAttribute?.("data-scene");
+      if (!scene) continue;
+      snapPoints.push({ p: snapPointForRange(r, scene), scene });
+    }
+    snapTargetIndex = findNearestSnapIndex(getProgress());
+  }
+
+  function findNearestSnapIndex(p) {
+    if (!snapPoints.length) return 0;
+    let best = 0;
+    let bestDist = Math.abs(snapPoints[0].p - p);
+    for (let i = 1; i < snapPoints.length; i++) {
+      const d = Math.abs(snapPoints[i].p - p);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  function findDirectionalSnapIndex(p, dir) {
+    const eps = 0.0005;
+    if (dir > 0) {
+      for (let i = 0; i < snapPoints.length; i++) {
+        if (snapPoints[i].p > p + eps) return i;
+      }
+      return snapPoints.length - 1;
+    }
+    if (dir < 0) {
+      for (let i = snapPoints.length - 1; i >= 0; i--) {
+        if (snapPoints[i].p < p - eps) return i;
+      }
+      return 0;
+    }
+    return findNearestSnapIndex(p);
+  }
+
+  function startSnapTo(targetP, { duration } = {}) {
+    if (!canSnapScroll()) return;
+    if (snapRAF) cancelAnimationFrame(snapRAF);
+    const startP = getProgress();
+    const endP = clamp01(targetP);
+    const dur = duration ?? (prefersReduced ? 0 : 520);
+    if (!Number.isFinite(endP)) return;
+    if (Math.abs(endP - startP) < 0.0005 || dur <= 0) {
+      snapAnimating = false;
+      snapRAF = 0;
+      wheelLock = false;
+      setProgress(endP);
+      lastP = -1;
+      uiDirty = true;
+      requestAnimationFrame(render);
+      return;
+    }
+    snapAnimating = true;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const t = clamp01((now - startTime) / dur);
+      const eased = smoothstep(t);
+      setProgress(lerp(startP, endP, eased));
+      if (t < 1) {
+        snapRAF = requestAnimationFrame(tick);
+      } else {
+        snapAnimating = false;
+        snapRAF = 0;
+        wheelLock = false;
+        lastP = -1;
+        uiDirty = true;
+        requestAnimationFrame(render);
+      }
+    };
+    snapRAF = requestAnimationFrame(tick);
+  }
+
+  function snapToIndex(idx) {
+    if (!snapPoints.length) return;
+    const clamped = Math.max(0, Math.min(snapPoints.length - 1, idx));
+    snapTargetIndex = clamped;
+    startSnapTo(snapPoints[clamped].p);
+  }
+
+  function snapByDirection(dir) {
+    if (!snapPoints.length || !canSnapScroll()) return;
+    const nextIndex = snapAnimating
+      ? Math.max(0, Math.min(snapPoints.length - 1, snapTargetIndex + (dir > 0 ? 1 : -1)))
+      : findDirectionalSnapIndex(getProgress(), dir);
+    snapToIndex(nextIndex);
+  }
+
+  function snapToNearest() {
+    if (!snapPoints.length || !canSnapScroll()) return;
+    snapToIndex(findNearestSnapIndex(getProgress()));
+  }
+
+  function onWheelSnap(e) {
+    if (!canSnapScroll() || !snapPoints.length) return;
+    if (e.ctrlKey) return;
+    if (snapAnimating || wheelLock) {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+    const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    if (!Number.isFinite(delta) || delta === 0) return;
+    wheelAccum += delta;
+    window.clearTimeout(wheelResetTimer);
+    wheelResetTimer = window.setTimeout(() => {
+      wheelAccum = 0;
+    }, 120);
+    const threshold = 28;
+    if (Math.abs(wheelAccum) >= threshold) {
+      const dir = wheelAccum > 0 ? 1 : -1;
+      wheelAccum = 0;
+      wheelLock = true;
+      snapByDirection(dir);
+    }
+  }
+
+  function onScrollSettle() {
+    if (!canSnapScroll() || snapAnimating) return;
+    window.clearTimeout(snapSettleTimer);
+    snapSettleTimer = window.setTimeout(() => {
+      snapToNearest();
+    }, 140);
+  }
+
+  function onTouchStartSnap(e) {
+    if (!canSnapScroll() || !e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    touchStart = { x: t.clientX, y: t.clientY };
+    touchLast = { x: t.clientX, y: t.clientY };
+  }
+
+  function onTouchMoveSnap(e) {
+    if (!canSnapScroll() || !touchStart || !e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    touchLast = { x: t.clientX, y: t.clientY };
+    const dx = touchLast.x - touchStart.x;
+    const dy = touchLast.y - touchStart.y;
+    if (Math.abs(dy) >= Math.abs(dx)) {
+      e.preventDefault();
+    }
+  }
+
+  function onTouchEndSnap() {
+    if (!canSnapScroll() || !touchStart || !touchLast) return;
+    const dx = touchLast.x - touchStart.x;
+    const dy = touchLast.y - touchStart.y;
+    touchStart = null;
+    touchLast = null;
+    if (Math.abs(dy) < Math.abs(dx)) return;
+    if (Math.abs(dy) < 12) return;
+    const dir = dy > 0 ? -1 : 1;
+    snapByDirection(dir);
+  }
+
+  function bindScrollSnapping() {
+    if (scrollAC) scrollAC.abort();
+    scrollAC = new AbortController();
+    const { signal } = scrollAC;
+    window.addEventListener("wheel", onWheelSnap, { passive: false, signal });
+    window.addEventListener("touchstart", onTouchStartSnap, { passive: true, signal });
+    window.addEventListener("touchmove", onTouchMoveSnap, { passive: false, signal });
+    window.addEventListener("touchend", onTouchEndSnap, { passive: true, signal });
+    window.addEventListener("touchcancel", onTouchEndSnap, { passive: true, signal });
+    if (!isCoarsePointer) {
+      window.addEventListener("scroll", onScrollSettle, { passive: true, signal });
+    }
+  }
+
+  function unbindScrollSnapping() {
+    if (scrollAC) scrollAC.abort();
+    scrollAC = null;
+    if (snapRAF) cancelAnimationFrame(snapRAF);
+    snapRAF = 0;
+    snapAnimating = false;
+    window.clearTimeout(snapSettleTimer);
+    window.clearTimeout(wheelResetTimer);
+    snapSettleTimer = 0;
+    wheelResetTimer = 0;
+    wheelAccum = 0;
+    touchStart = null;
+    touchLast = null;
   }
 
   function tryPlay(video) {
@@ -269,11 +488,8 @@
       bgSlidesWrap &&
       bgSegments.length > 0 &&
       bgSegments.some((s) => p >= s.start - 0.002 && p <= s.end + 0.002);
-    const inBgLayer = inBgSegment || inEpisodesSegment;
-    if (bgSlidesWrap) bgSlidesWrap.style.opacity = inBgLayer ? "1" : "0";
-
-    if (homeVideo) homeVideo.style.opacity = isHomePhase && !inBgLayer ? "0.92" : "0";
-    if (mapVideo) mapVideo.style.opacity = !isHomePhase && !inBgLayer ? "0.92" : "0";
+    let bgLayerOpacity = inEpisodesSegment || inBgSegment ? 1 : 0;
+    let firstBgV = 0;
 
     // Addison's Walk interstitial (once): after overview-3 and before imperative.
     if (mode === "home" && !addisonPlayed && addisonTriggerAt != null && imperativeRange != null && p >= addisonTriggerAt) {
@@ -294,6 +510,7 @@
         const bg = bgByScene.get(sceneName);
         if (bg) {
           bg.style.opacity = String(v);
+          if (firstBgRange === r) firstBgV = v;
           if (bg.tagName === "VIDEO") {
             if (v > 0.05) tryPlay(bg);
             else bg.pause?.();
@@ -301,6 +518,20 @@
         }
       }
     }
+
+    if (firstBgRange) {
+      const span = Math.max(0.0001, firstBgRange.end - firstBgRange.start);
+      const fade = prefersReduced ? span * 0.1 : span * 0.18;
+      const fadeEnd = Math.max(firstBgRange.start + fade * 1.05, overviewStart + enterThreshold);
+      if (p <= fadeEnd) {
+        bgLayerOpacity = firstBgV;
+      }
+    }
+
+    if (bgSlidesWrap) bgSlidesWrap.style.opacity = String(clamp01(bgLayerOpacity));
+    const bgFade = clamp01(bgLayerOpacity);
+    if (homeVideo) homeVideo.style.opacity = isHomePhase ? String(0.92 * (1 - bgFade)) : "0";
+    if (mapVideo) mapVideo.style.opacity = !isHomePhase ? String(0.92 * (1 - bgFade)) : "0";
 
     // Episodes dock behavior: hover expands + background swaps, auto-open Ep1 on first entry.
     if (episodesRange) {
@@ -403,6 +634,7 @@
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     lastP = -1;
+    unbindScrollSnapping();
   }
 
   function enterHome({ instant = false } = {}) {
@@ -431,6 +663,7 @@
     buildRanges();
     addisonPlayed = false;
     episodesInitialized = false;
+    bindScrollSnapping();
     if (addisonVideo) {
       addisonVideo.pause?.();
       addisonVideo.currentTime = 0;
@@ -516,10 +749,12 @@
       document.body.classList.add("is-home");
       window.addEventListener("scroll", scheduleRender, { passive: true });
       window.addEventListener("resize", scheduleRender);
+      bindScrollSnapping();
       // Jump to imperative start and immediately render the card (avoid any black "gap").
       // Jump *into* the imperative range (past fade-in) so it's visible instantly.
       const span = imperativeRange.end - imperativeRange.start;
-      const jumpP = imperativeRange.start + Math.min(span * 0.35, 0.02);
+      const fade = prefersReduced ? span * 0.1 : span * 0.18;
+      const jumpP = imperativeRange.start + Math.min(span * 0.35, fade * 1.25);
       setProgress(jumpP);
       lastP = -1;
       uiDirty = true;
@@ -673,7 +908,7 @@
       if (r) {
         const span = Math.max(0.0001, r.end - r.start);
         const fade = (prefersReduced ? span * 0.10 : span * 0.18);
-        const bump = Math.min(span * 0.35, fade * 1.05, 0.03);
+        const bump = Math.min(span * 0.35, fade * 1.25);
         targetP = Math.min(r.end - 0.001, r.start + bump);
       } else {
         const start = sceneStartByName.get(scene);
