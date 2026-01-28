@@ -413,6 +413,56 @@ body.is-addison .stage__interstitial{
   touch-action: manipulation;
 }
 
+/* "Tap to unmute" overlay (shown when video is playing muted) */
+.unmuteOverlay{
+  position:fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translate3d(-50%, 0, 0);
+  z-index: 70;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.22);
+  background:
+    radial-gradient(900px 240px at 20% 0%, rgba(255,255,255,.07), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.46), rgba(0,0,0,.78));
+  color: rgba(255,255,255,.94);
+  font-family: var(--font-title);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: 11px;
+  box-shadow: 0 34px 120px rgba(0,0,0,.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor:pointer;
+  pointer-events:auto;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+.unmuteOverlay:hover{
+  border-color: rgba(255,255,255,.32);
+  background:
+    radial-gradient(900px 240px at 20% 0%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,.82));
+}
+.unmuteOverlay:active{transform: translate3d(-50%, 1px, 0)}
+.unmuteOverlay:focus-visible{
+  outline: 2px solid rgba(255,255,255,.42);
+  outline-offset: 2px;
+}
+
+@media (hover: none), (pointer: coarse){
+  .unmuteOverlay{
+    width: calc(100% - 28px);
+    max-width: 520px;
+    text-align:center;
+  }
+}
+
 .stage__vignette{
   position:absolute;
   inset:-1px;

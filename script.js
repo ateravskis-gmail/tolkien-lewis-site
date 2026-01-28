@@ -18,6 +18,7 @@
   const trailerCursor = qs("[data-trailer-cursor]");
   const trailerTimeEl = qs("[data-trailer-time]");
   const trailerTipEl = qs(".trailer-cursor__tip");
+  const unmuteOverlay = qs("[data-unmute]");
   const bgEls = qsa(".bg-slides [data-bg]");
   const bgByScene = new Map(bgEls.map((el) => [el.getAttribute("data-bg"), el]));
   const bgSlidesWrap = qs(".bg-slides");
@@ -466,6 +467,12 @@
     cursorRAF = 0;
   }
 
+  function setUnmuteOverlay({ show, text } = {}) {
+    if (!unmuteOverlay) return;
+    if (typeof text === "string" && text) unmuteOverlay.textContent = text;
+    unmuteOverlay.hidden = !show;
+  }
+
   function render() {
     raf = 0;
     if (!entered) return;
@@ -717,6 +724,7 @@
       trailerVideo.pause?.();
       trailerVideo.currentTime = 0;
     }
+    setUnmuteOverlay({ show: false });
   }
 
   function onMouseMove(e) {
@@ -733,6 +741,7 @@
       addisonVideo.currentTime = 0;
     }
     document.body.classList.remove("is-addison");
+    setUnmuteOverlay({ show: false });
   }
 
   function startAddisonScene() {
@@ -815,6 +824,7 @@
       tryPlay(addisonVideo);
       armSkip();
       if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
+      setUnmuteOverlay({ show: true, text: "Tap to unmute" });
     };
 
     const enableAudio = () => {
@@ -831,11 +841,13 @@
           addisonVideo.volume = 0;
           hasAudio = false;
           if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
+          setUnmuteOverlay({ show: true, text: "Tap to unmute" });
         });
       }
       hasAudio = true;
       armSkip();
       if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
+      setUnmuteOverlay({ show: false });
     };
 
     const startPlaybackWithAudio = () => {
@@ -873,6 +885,7 @@
       // Autoplay muted immediately to avoid a black stall, then use tap to enable audio.
       startMutedAutoplay();
       if (trailerTipEl) trailerTipEl.textContent = "Tap for Sound";
+      setUnmuteOverlay({ show: true, text: "Tap to unmute" });
       // If autoplay failed for any reason, allow first gesture to start playback with audio.
       onFirstUserGesture(() => {
         if (!started) startPlaybackWithAudio();
@@ -889,9 +902,23 @@
         p.catch(() => {
           addisonVideo.muted = true;
           tryPlay(addisonVideo);
+          setUnmuteOverlay({ show: true, text: "Click to unmute" });
         });
       }
       onFirstUserGesture(finish, { signal });
+    }
+
+    // Unmute overlay click (works even if we also listen at window level).
+    if (unmuteOverlay) {
+      unmuteOverlay.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          enableAudio();
+        },
+        { signal },
+      );
     }
 
     addisonVideo.addEventListener("loadedmetadata", () => setCursorForVideo(addisonVideo), { once: true, signal });
@@ -937,9 +964,40 @@
     if (trailerVideo) {
       trailerVideo.loop = false;
       trailerVideo.muted = false; // user gesture (Enter) should allow audio
+      trailerVideo.volume = 1;
       trailerVideo.currentTime = 0;
       setTrailerCursorText();
       tryPlay(trailerVideo);
+
+      // If trailer ends up playing muted (browser restriction), show an unmute affordance.
+      trailerVideo.addEventListener(
+        "volumechange",
+        () => {
+          const muted = !!trailerVideo.muted || trailerVideo.volume === 0;
+          const playing = !trailerVideo.paused;
+          setUnmuteOverlay({
+            show: playing && muted,
+            text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+          });
+        },
+        { passive: true, signal },
+      );
+      trailerVideo.addEventListener(
+        "play",
+        () => {
+          const muted = !!trailerVideo.muted || trailerVideo.volume === 0;
+          setUnmuteOverlay({
+            show: muted,
+            text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+          });
+        },
+        { passive: true, signal },
+      );
+      trailerVideo.addEventListener(
+        "pause",
+        () => setUnmuteOverlay({ show: false }),
+        { passive: true, signal },
+      );
 
       trailerVideo.addEventListener(
         "loadedmetadata",
@@ -975,6 +1033,22 @@
       enterHome({ instant: true, suppressSnapMs });
     };
     onFirstUserGesture(onSkip, { signal });
+
+    if (unmuteOverlay) {
+      unmuteOverlay.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!trailerVideo) return;
+          trailerVideo.muted = false;
+          trailerVideo.volume = 1;
+          tryPlay(trailerVideo);
+          setUnmuteOverlay({ show: false });
+        },
+        { signal },
+      );
+    }
   }
 
   function jumpTo(scene) {
