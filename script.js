@@ -730,7 +730,8 @@
     teardownHome();
 
     // Make sure we don't immediately retrigger on resume.
-    setProgress(addisonTriggerAt);
+    // Nudge forward so we don't land on a black edge frame.
+    setProgress(addisonTriggerAt + 0.001);
 
     cleanupAddisonScene();
     document.body.classList.add("is-addison");
@@ -808,8 +809,16 @@
       window.addEventListener("pointerdown", onSkip, { capture: true, passive: true, signal });
       window.addEventListener("touchstart", onSkip, { capture: true, passive: true, signal });
     } else {
-      // Desktop: try to autoplay with audio; click/tap skips.
-      tryPlay(addisonVideo);
+      // Desktop: attempt autoplay with audio; if blocked, fall back to muted autoplay
+      // so we don't stall on a black screen until the next gesture.
+      if (trailerTipEl) trailerTipEl.textContent = "Click to Skip";
+      const p = addisonVideo.play?.();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          addisonVideo.muted = true;
+          tryPlay(addisonVideo);
+        });
+      }
       onFirstUserGesture(finish, { signal });
     }
 
