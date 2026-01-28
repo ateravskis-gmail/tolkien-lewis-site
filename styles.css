@@ -145,13 +145,23 @@ body:not(.has-scrolled) .roadmap__item[data-roadmap-jump="overview-1"] .roadmap_
     right: calc(12px + env(safe-area-inset-right, 0px));
     padding: 8px;
     gap: 6px;
-    opacity: .96;
+    opacity: 0;
+    pointer-events:none;
+    transform: translate3d(14px, -50%, 0);
+    transition: opacity .22s ease, transform .22s ease;
   }
   .roadmap__item{
     padding: 8px;
   }
   .roadmap__label{
     display:none;
+  }
+
+  /* Mobile nav peek: fade in, hold, then JS hides on next scroll gesture */
+  body.is-roadmap-peek .roadmap{
+    opacity: .96;
+    pointer-events:auto;
+    transform: translate3d(0, -50%, 0);
   }
 }
 
@@ -363,6 +373,8 @@ body.is-trailer .overlay{
 /* Timestamp cursor during trailer playback */
 body.is-trailer,
 body.is-addison{cursor:none}
+.is-muted-video{cursor:auto !important}
+.is-muted-video *{cursor:auto}
 .trailer-cursor{
   position:fixed;
   left:0;
@@ -378,6 +390,8 @@ body.is-addison{cursor:none}
 .trailer-cursor{display:none}
 body.is-trailer .trailer-cursor{display:block}
 body.is-addison .trailer-cursor{display:block}
+/* When a video is muted, show the unmute overlay instead of the cursor UI. */
+body.is-muted-video .trailer-cursor{display:none !important}
 .trailer-cursor__time{
   font-size: 12px;
   padding: 8px 10px;

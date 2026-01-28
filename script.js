@@ -79,6 +79,9 @@
   let touchLast = null;
   let scrollAC = null;
   let skipLockTimer = 0;
+  let roadmapPeekTimer = 0;
+  let roadmapPeekSeen = false;
+  let roadmapPeekArmed = false;
 
   function applySkipLock(ms) {
     window.clearTimeout(skipLockTimer);
@@ -86,6 +89,42 @@
     skipLockTimer = window.setTimeout(() => {
       document.body.classList.remove("is-skip-lock");
     }, ms);
+  }
+
+  function isMobileRoadmap() {
+    return isCoarsePointer || window.matchMedia?.("(max-width: 980px)")?.matches;
+  }
+
+  function resetRoadmapPeek() {
+    window.clearTimeout(roadmapPeekTimer);
+    roadmapPeekTimer = 0;
+    roadmapPeekArmed = false;
+    document.body.classList.remove("is-roadmap-peek");
+  }
+
+  function onRoadmapScrollGesture() {
+    if (!isMobileRoadmap()) return;
+    if (roadmapPeekSeen) return;
+    // If we're in trailer/addison/intro, don't show the roadmap hint.
+    if (mode !== "home" || !entered) return;
+    // Don't compete with the muted-video UI.
+    if (document.body.classList.contains("is-muted-video")) return;
+
+    if (!document.body.classList.contains("is-roadmap-peek")) {
+      document.body.classList.add("is-roadmap-peek");
+      roadmapPeekArmed = false;
+      window.clearTimeout(roadmapPeekTimer);
+      roadmapPeekTimer = window.setTimeout(() => {
+        roadmapPeekArmed = true;
+      }, 1000);
+      return;
+    }
+
+    // After the 1s hold, the next scroll gesture hides it permanently.
+    if (roadmapPeekArmed) {
+      roadmapPeekSeen = true;
+      resetRoadmapPeek();
+    }
   }
 
   // --- small math helpers
@@ -323,6 +362,7 @@
       const dir = wheelAccum > 0 ? 1 : -1;
       wheelAccum = 0;
       wheelLock = true;
+      onRoadmapScrollGesture();
       snapByDirection(dir);
     }
   }
@@ -362,6 +402,7 @@
     if (Math.abs(dy) < Math.abs(dx)) return;
     if (Math.abs(dy) < 12) return;
     const dir = dy > 0 ? -1 : 1;
+    onRoadmapScrollGesture();
     snapByDirection(dir);
   }
 
@@ -407,6 +448,10 @@
     const once = (e) => {
       if (fired) return;
       if (!e?.isTrusted) return;
+      // Don't treat clicks on the unmute overlay as "skip" gestures.
+      // (Capture listeners would otherwise fire before the overlay click handler.)
+      const target = e?.target;
+      if (target && typeof target.closest === "function" && target.closest("[data-unmute]")) return;
       fired = true;
       fn(e);
     };
@@ -471,6 +516,7 @@
     if (!unmuteOverlay) return;
     if (typeof text === "string" && text) unmuteOverlay.textContent = text;
     unmuteOverlay.hidden = !show;
+    document.body.classList.toggle("is-muted-video", !!show);
   }
 
   function render() {
@@ -665,6 +711,7 @@
     document.body.classList.remove("is-trailer");
     document.body.classList.add("is-home");
     document.body.classList.remove("is-addison");
+    resetRoadmapPeek();
     window.scrollTo({ top: 0, behavior: "auto" });
     if (homeVideo) {
       homeVideo.muted = true;
@@ -828,7 +875,9 @@
     };
 
     const enableAudio = () => {
-      if (!started) return;
+      // On desktop we may already be playing (muted) without having set `started`.
+      // Allow unmute regardless so the overlay always works.
+      if (!started) started = true;
       if (hasAudio) return;
       // Attempt to unmute within a user-gesture handler.
       addisonVideo.muted = false;
@@ -902,11 +951,25 @@
         p.catch(() => {
           addisonVideo.muted = true;
           tryPlay(addisonVideo);
-          setUnmuteOverlay({ show: true, text: "Click to unmute" });
         });
       }
+      // We start muted by default; show the unmute affordance immediately on desktop.
+      setUnmuteOverlay({ show: true, text: "Click to unmute" });
       onFirstUserGesture(finish, { signal });
     }
+
+    // Keep muted UI in sync (both Addison and Trailer can be forced muted by the browser).
+    const updateMutedUi = () => {
+      const muted = !!addisonVideo.muted || addisonVideo.volume === 0;
+      const playing = !addisonVideo.paused;
+      setUnmuteOverlay({
+        show: playing && muted,
+        text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+      });
+    };
+    addisonVideo.addEventListener("volumechange", updateMutedUi, { passive: true, signal });
+    addisonVideo.addEventListener("play", updateMutedUi, { passive: true, signal });
+    addisonVideo.addEventListener("pause", () => setUnmuteOverlay({ show: false }), { passive: true, signal });
 
     // Unmute overlay click (works even if we also listen at window level).
     if (unmuteOverlay) {
