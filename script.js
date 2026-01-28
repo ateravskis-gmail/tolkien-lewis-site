@@ -80,8 +80,7 @@
   let scrollAC = null;
   let skipLockTimer = 0;
   let roadmapPeekTimer = 0;
-  let roadmapPeekSeen = false;
-  let roadmapPeekArmed = false;
+  let roadmapPeekTouchShown = false;
 
   function applySkipLock(ms) {
     window.clearTimeout(skipLockTimer);
@@ -98,33 +97,22 @@
   function resetRoadmapPeek() {
     window.clearTimeout(roadmapPeekTimer);
     roadmapPeekTimer = 0;
-    roadmapPeekArmed = false;
+    roadmapPeekTouchShown = false;
     document.body.classList.remove("is-roadmap-peek");
   }
 
-  function onRoadmapScrollGesture() {
+  function showRoadmapPeek() {
     if (!isMobileRoadmap()) return;
-    if (roadmapPeekSeen) return;
     // If we're in trailer/addison/intro, don't show the roadmap hint.
     if (mode !== "home" || !entered) return;
     // Don't compete with the muted-video UI.
     if (document.body.classList.contains("is-muted-video")) return;
 
-    if (!document.body.classList.contains("is-roadmap-peek")) {
-      document.body.classList.add("is-roadmap-peek");
-      roadmapPeekArmed = false;
-      window.clearTimeout(roadmapPeekTimer);
-      roadmapPeekTimer = window.setTimeout(() => {
-        roadmapPeekArmed = true;
-      }, 1000);
-      return;
-    }
-
-    // After the 1s hold, the next scroll gesture hides it permanently.
-    if (roadmapPeekArmed) {
-      roadmapPeekSeen = true;
-      resetRoadmapPeek();
-    }
+    document.body.classList.add("is-roadmap-peek");
+    window.clearTimeout(roadmapPeekTimer);
+    roadmapPeekTimer = window.setTimeout(() => {
+      document.body.classList.remove("is-roadmap-peek");
+    }, 1000);
   }
 
   // --- small math helpers
@@ -350,6 +338,8 @@
       return;
     }
     e.preventDefault();
+    // Show mobile roadmap immediately on gesture start.
+    showRoadmapPeek();
     const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
     if (!Number.isFinite(delta) || delta === 0) return;
     wheelAccum += delta;
@@ -362,7 +352,6 @@
       const dir = wheelAccum > 0 ? 1 : -1;
       wheelAccum = 0;
       wheelLock = true;
-      onRoadmapScrollGesture();
       snapByDirection(dir);
     }
   }
@@ -380,6 +369,7 @@
     const t = e.touches[0];
     touchStart = { x: t.clientX, y: t.clientY };
     touchLast = { x: t.clientX, y: t.clientY };
+    roadmapPeekTouchShown = false;
   }
 
   function onTouchMoveSnap(e) {
@@ -390,6 +380,11 @@
     const dy = touchLast.y - touchStart.y;
     if (Math.abs(dy) >= Math.abs(dx)) {
       e.preventDefault();
+      // Trigger the roadmap peek near the start of the swipe (not at the end).
+      if (!roadmapPeekTouchShown && Math.abs(dy) > 6) {
+        roadmapPeekTouchShown = true;
+        showRoadmapPeek();
+      }
     }
   }
 
@@ -402,7 +397,6 @@
     if (Math.abs(dy) < Math.abs(dx)) return;
     if (Math.abs(dy) < 12) return;
     const dir = dy > 0 ? -1 : 1;
-    onRoadmapScrollGesture();
     snapByDirection(dir);
   }
 
