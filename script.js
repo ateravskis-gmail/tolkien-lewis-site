@@ -19,7 +19,7 @@
     // Short, non-identifying session id for correlating logs.
     return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
   })();
-  const __DBG_BUILD_ID = "nar21";
+  const __DBG_BUILD_ID = "nar23";
   let __DBG_SEQ = 0;
   const __DBG_BUFFER = [];
   const __dlog = (tag, data) => {
@@ -52,9 +52,18 @@
     __DBG_BUFFER.length = 0;
   };
 
+  const __DBG_SCRIPT_SRC = (() => {
+    try {
+      const s = Array.from(document.scripts || []).find((el) => (el?.src || "").includes("script.js"));
+      return s?.src || null;
+    } catch {
+      return null;
+    }
+  })();
   __dlog("debugEnabled", {
     buildId: __DBG_BUILD_ID,
     href: window.location.href,
+    scriptSrc: __DBG_SCRIPT_SRC,
     userAgent: navigator.userAgent,
     viewport: { w: window.innerWidth, h: window.innerHeight },
   });
@@ -605,18 +614,18 @@
       ) {
         return;
       }
-      if (e.key === "PageDown") {
+      if (e.key === "PageDown" || e.key === "ArrowDown") {
         e.preventDefault();
         showRoadmapPeek();
         // #region agent log
-        __dlog("keydown", { key: "PageDown", scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
+        __dlog("keydown", { key: e.key, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
         // #endregion
         snapByDirection(1);
-      } else if (e.key === "PageUp") {
+      } else if (e.key === "PageUp" || e.key === "ArrowUp") {
         e.preventDefault();
         showRoadmapPeek();
         // #region agent log
-        __dlog("keydown", { key: "PageUp", scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
+        __dlog("keydown", { key: e.key, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
         // #endregion
         snapByDirection(-1);
       }

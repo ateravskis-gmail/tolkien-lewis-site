@@ -163,6 +163,13 @@ body:not(.has-scrolled) .roadmap__item[data-roadmap-jump="overview-1"] .roadmap_
     pointer-events:auto;
     transform: translate3d(0, -50%, 0);
   }
+
+  /* Once the user has started scrolling, keep the dock available on mobile sizes. */
+  body.has-scrolled .roadmap{
+    opacity: .96;
+    pointer-events:auto;
+    transform: translate3d(0, -50%, 0);
+  }
 }
 
 button{font-family: inherit}
