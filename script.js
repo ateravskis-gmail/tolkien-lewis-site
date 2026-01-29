@@ -20,21 +20,73 @@
     return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
   })();
   let __DBG_SEQ = 0;
+  const __DBG_BUFFER = [];
   const __dlog = (tag, data) => {
     if (!__DBG_ENABLED) return;
     try {
-      console.log("[scroll-debug]", {
+      const payload = {
         ts: new Date().toISOString(),
         seq: ++__DBG_SEQ,
         session: __DBG_SESSION,
         tag,
         data,
-      });
+      };
+      __DBG_BUFFER.push(payload);
+      // Print as a single-line JSON string so copy/paste captures full data.
+      console.log(`[scroll-debug] ${JSON.stringify(payload)}`);
     } catch {
       // ignore
     }
   };
-  __dlog("debugEnabled", { href: window.location.href, userAgent: navigator.userAgent });
+  // Helper for copying the full trace from DevTools Console.
+  // Usage: copy(window.__scrollDebugDump())
+  window.__scrollDebugDump = () => {
+    try {
+      return __DBG_BUFFER.map((x) => JSON.stringify(x)).join("\n");
+    } catch {
+      return "";
+    }
+  };
+  window.__scrollDebugClear = () => {
+    __DBG_BUFFER.length = 0;
+  };
+
+  __dlog("debugEnabled", { href: window.location.href, userAgent: navigator.userAgent, viewport: { w: window.innerWidth, h: window.innerHeight } });
+
+  // Capture programmatic scroll jumps (helps identify unexpected scrollTo calls).
+  try {
+    if (!window.__scrollDebugScrollToWrapped) {
+      window.__scrollDebugScrollToWrapped = true;
+      const __origScrollTo = window.scrollTo.bind(window);
+      window.scrollTo = (optsOrX, maybeY) => {
+        if (__DBG_ENABLED) {
+          let top = null;
+          let behavior = null;
+          if (typeof optsOrX === "object" && optsOrX) {
+            top = typeof optsOrX.top === "number" ? optsOrX.top : null;
+            behavior = typeof optsOrX.behavior === "string" ? optsOrX.behavior : null;
+          } else if (typeof optsOrX === "number") {
+            top = typeof maybeY === "number" ? maybeY : null;
+          }
+          // Keep stack short to avoid huge logs; enough to see caller.
+          const stack = new Error().stack?.split("\n").slice(0, 6).join("\n") || null;
+          __dlog("scrollTo", {
+            top,
+            behavior,
+            fromScrollY: window.scrollY,
+            mode,
+            entered,
+            snapAnimating,
+            wheelLock,
+            stack,
+          });
+        }
+        return __origScrollTo(optsOrX, maybeY);
+      };
+    }
+  } catch {
+    // ignore
+  }
   // #endregion
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
