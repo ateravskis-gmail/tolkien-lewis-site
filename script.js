@@ -159,6 +159,8 @@
   let snapAnimating = false;
   let snapRAF = 0;
   let snapSettleTimer = 0;
+  let lastNonHomeSnapAt = 0;
+  let lastNonHomeSnapIndex = 0;
   let wheelAccum = 0;
   let wheelResetTimer = 0;
   let wheelLock = false;
@@ -443,6 +445,10 @@
     if (!snapPoints.length) return;
     const clamped = Math.max(0, Math.min(snapPoints.length - 1, idx));
     snapTargetIndex = clamped;
+    if (clamped > 0) {
+      lastNonHomeSnapAt = Date.now();
+      lastNonHomeSnapIndex = clamped;
+    }
     startSnapTo(snapPoints[clamped].p);
   }
 
@@ -474,6 +480,14 @@
     // This avoids accidental jump-backs on some browsers / reduced-motion where snaps are instantaneous.
     if (idx === 0 && window.scrollY > 18) {
       idx = findNearestNonHomeSnapIndex(p);
+    }
+    // Also avoid snapping back to Home immediately after a programmatic snap to a non-home scene.
+    // This protects against tiny follow-up scroll events (or focus/layout quirks) that momentarily put us at p≈0.
+    if (idx === 0 && window.scrollY <= 18 && snapTargetIndex > 0 && lastNonHomeSnapAt) {
+      const since = Date.now() - lastNonHomeSnapAt;
+      if (since < 1400 && lastNonHomeSnapIndex > 0) {
+        idx = lastNonHomeSnapIndex;
+      }
     }
 
     // #region agent log
