@@ -1095,7 +1095,7 @@
           const playing = !trailerVideo.paused;
           setUnmuteOverlay({
             show: playing && muted,
-            text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+            text: isCoarsePointer ? "Tap here to unmute" : "Click here to unmute",
           });
         },
         { passive: true, signal },
@@ -1106,7 +1106,7 @@
           const muted = !!trailerVideo.muted || trailerVideo.volume === 0;
           setUnmuteOverlay({
             show: muted,
-            text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+            text: isCoarsePointer ? "Tap here to unmute" : "Click here to unmute",
           });
         },
         { passive: true, signal },
