@@ -19,7 +19,7 @@
     // Short, non-identifying session id for correlating logs.
     return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
   })();
-  const __DBG_BUILD_ID = "nar20";
+  const __DBG_BUILD_ID = "nar21";
   let __DBG_SEQ = 0;
   const __DBG_BUFFER = [];
   const __dlog = (tag, data) => {
@@ -87,6 +87,10 @@
             stack,
           });
         }
+        // Preserve overload semantics:
+        // - scrollTo({top, left, behavior})
+        // - scrollTo(x, y)
+        if (typeof optsOrX === "object" && optsOrX) return __origScrollTo(optsOrX);
         return __origScrollTo(optsOrX, maybeY);
       };
     }
