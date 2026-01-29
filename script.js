@@ -2,6 +2,41 @@
   const qs = (sel, root = document) => root.querySelector(sel);
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
+  // #region agent log
+  // Console-only debug instrumentation for deployed repros.
+  // Enable by adding `?debug=1` (or `?debug=true`) to the URL.
+  const __DBG_ENABLED = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const v = sp.get("debug");
+      if (v == null) return false;
+      return v === "" || v === "1" || v === "true" || v === "yes";
+    } catch {
+      return false;
+    }
+  })();
+  const __DBG_SESSION = (() => {
+    // Short, non-identifying session id for correlating logs.
+    return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
+  })();
+  let __DBG_SEQ = 0;
+  const __dlog = (tag, data) => {
+    if (!__DBG_ENABLED) return;
+    try {
+      console.log("[scroll-debug]", {
+        ts: new Date().toISOString(),
+        seq: ++__DBG_SEQ,
+        session: __DBG_SESSION,
+        tag,
+        data,
+      });
+    } catch {
+      // ignore
+    }
+  };
+  __dlog("debugEnabled", { href: window.location.href, userAgent: navigator.userAgent });
+  // #endregion
+
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isCoarsePointer =
     window.matchMedia?.("(pointer: coarse)").matches ||
@@ -172,6 +207,19 @@
 
     rebuildSnapPoints();
 
+    // #region agent log
+    __dlog("buildRanges", {
+      mode,
+      entered,
+      totalWeight: total,
+      overviewStart,
+      enterThreshold,
+      scrollY: window.scrollY,
+      maxScroll: Math.max(1, document.documentElement.scrollHeight - window.innerHeight),
+      snapPointsHead: snapPoints.slice(0, 5).map((s) => ({ scene: s.scene, p: Number(s.p.toFixed(6)) })),
+    });
+    // #endregion
+
     // Compute merged segments of scenes that have explicit backgrounds assigned.
     firstBgRange = null;
     bgSegments = [];
@@ -281,6 +329,17 @@
     const dur = duration ?? (prefersReduced ? 0 : 520);
     if (!Number.isFinite(endP)) return;
 
+    // #region agent log
+    __dlog("startSnapTo", {
+      startP: Number(startP.toFixed(6)),
+      endP: Number(endP.toFixed(6)),
+      dur,
+      snapTargetIndex,
+      snapAnimating,
+      wheelLock,
+    });
+    // #endregion
+
     if (Math.abs(endP - startP) < 0.0005 || dur <= 0) {
       snapAnimating = false;
       snapRAF = 0;
@@ -305,6 +364,9 @@
         wheelLock = false;
         lastP = -1;
         uiDirty = true;
+        // #region agent log
+        __dlog("snapComplete", { endP: Number(endP.toFixed(6)), scrollY: window.scrollY });
+        // #endregion
         requestAnimationFrame(render);
       }
     };
@@ -324,6 +386,16 @@
       ? Math.max(0, Math.min(snapPoints.length - 1, snapTargetIndex + (dir > 0 ? 1 : -1)))
       : findDirectionalSnapIndex(getProgress(), dir);
 
+    // #region agent log
+    __dlog("snapByDirection", {
+      dir,
+      p: Number(getProgress().toFixed(6)),
+      nextIndex,
+      nextScene: snapPoints[nextIndex]?.scene,
+      nextP: Number((snapPoints[nextIndex]?.p ?? 0).toFixed(6)),
+    });
+    // #endregion
+
     snapToIndex(nextIndex);
   }
 
@@ -331,6 +403,16 @@
     if (!snapPoints.length || !canSnapScroll()) return;
     const p = getProgress();
     const idx = findNearestSnapIndex(p);
+
+    // #region agent log
+    __dlog("snapToNearest", {
+      p: Number(p.toFixed(6)),
+      idx,
+      idxScene: snapPoints[idx]?.scene,
+      idxP: Number((snapPoints[idx]?.p ?? 0).toFixed(6)),
+      head: snapPoints.slice(0, 4).map((s) => ({ scene: s.scene, p: Number(s.p.toFixed(6)) })),
+    });
+    // #endregion
 
     snapToIndex(idx);
   }
@@ -357,6 +439,9 @@
       const dir = wheelAccum > 0 ? 1 : -1;
       wheelAccum = 0;
       wheelLock = true;
+      // #region agent log
+      __dlog("wheelThreshold", { dir, delta, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
+      // #endregion
       snapByDirection(dir);
     }
   }
@@ -368,6 +453,10 @@
     snapSettleTimer = window.setTimeout(() => {
       snapToNearest();
     }, 140);
+
+    // #region agent log
+    __dlog("onScrollSettleSchedule", { scrollY: window.scrollY, p: Number(getProgress().toFixed(6)), wheelLock });
+    // #endregion
   }
 
   function onTouchStartSnap(e) {
@@ -423,10 +512,16 @@
       if (e.key === "PageDown") {
         e.preventDefault();
         showRoadmapPeek();
+        // #region agent log
+        __dlog("keydown", { key: "PageDown", scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
+        // #endregion
         snapByDirection(1);
       } else if (e.key === "PageUp") {
         e.preventDefault();
         showRoadmapPeek();
+        // #region agent log
+        __dlog("keydown", { key: "PageUp", scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
+        // #endregion
         snapByDirection(-1);
       }
     };
@@ -439,6 +534,10 @@
     if (!isCoarsePointer) {
       window.addEventListener("scroll", onScrollSettle, { passive: true, signal });
     }
+
+    // #region agent log
+    __dlog("bindScrollSnapping", { isCoarsePointer, prefersReduced });
+    // #endregion
   }
 
   function unbindScrollSnapping() {
@@ -1162,6 +1261,16 @@
 
     if (targetP == null) return;
 
+    // #region agent log
+    __dlog("jumpTo", {
+      scene,
+      pBefore: Number(getProgress().toFixed(6)),
+      targetP: Number(targetP.toFixed(6)),
+      snapIdx: snapPoints.findIndex((s) => s.scene === scene),
+      canSnapScroll: canSnapScroll(),
+    });
+    // #endregion
+
     // If the user uses the menu to jump *past* Addison’s Walk, don't force them to watch it.
     if (!addisonPlayed && addisonTriggerAt != null && targetP >= addisonTriggerAt) {
       addisonPlayed = true;
@@ -1184,6 +1293,9 @@
   for (const b of roadmapJumpBtns) {
     b.addEventListener("click", () => {
       const scene = b.getAttribute("data-roadmap-jump") || "home";
+      // #region agent log
+      __dlog("roadmapClick", { scene, pBefore: Number(getProgress().toFixed(6)), scrollY: window.scrollY });
+      // #endregion
       jumpTo(scene);
       // Clicking focuses the button; that keeps :focus-within on the dock, so labels stay open.
       // Blur on pointer/click so labels collapse again (keyboard users still get focus behavior).
