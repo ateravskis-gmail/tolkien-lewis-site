@@ -2,112 +2,6 @@
   const qs = (sel, root = document) => root.querySelector(sel);
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // #region agent log
-  // Console-only debug instrumentation for deployed repros.
-  // Enable by adding `?debug=1` (or `?debug=true`) to the URL.
-  const __DBG_ENABLED = (() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      const v = sp.get("debug");
-      if (v == null) return false;
-      return v === "" || v === "1" || v === "true" || v === "yes";
-    } catch {
-      return false;
-    }
-  })();
-  const __DBG_SESSION = (() => {
-    // Short, non-identifying session id for correlating logs.
-    return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
-  })();
-  const __DBG_BUILD_ID = "nar23";
-  let __DBG_SEQ = 0;
-  const __DBG_BUFFER = [];
-  const __dlog = (tag, data) => {
-    if (!__DBG_ENABLED) return;
-    try {
-      const payload = {
-        ts: new Date().toISOString(),
-        seq: ++__DBG_SEQ,
-        session: __DBG_SESSION,
-        tag,
-        data,
-      };
-      __DBG_BUFFER.push(payload);
-      // Print as a single-line JSON string so copy/paste captures full data.
-      console.log(`[scroll-debug] ${JSON.stringify(payload)}`);
-    } catch {
-      // ignore
-    }
-  };
-  // Helper for copying the full trace from DevTools Console.
-  // Usage: copy(window.__scrollDebugDump())
-  window.__scrollDebugDump = () => {
-    try {
-      return __DBG_BUFFER.map((x) => JSON.stringify(x)).join("\n");
-    } catch {
-      return "";
-    }
-  };
-  window.__scrollDebugClear = () => {
-    __DBG_BUFFER.length = 0;
-  };
-
-  const __DBG_SCRIPT_SRC = (() => {
-    try {
-      const s = Array.from(document.scripts || []).find((el) => (el?.src || "").includes("script.js"));
-      return s?.src || null;
-    } catch {
-      return null;
-    }
-  })();
-  __dlog("debugEnabled", {
-    buildId: __DBG_BUILD_ID,
-    href: window.location.href,
-    scriptSrc: __DBG_SCRIPT_SRC,
-    userAgent: navigator.userAgent,
-    viewport: { w: window.innerWidth, h: window.innerHeight },
-  });
-
-  // Capture programmatic scroll jumps (helps identify unexpected scrollTo calls).
-  try {
-    if (!window.__scrollDebugScrollToWrapped) {
-      window.__scrollDebugScrollToWrapped = true;
-      const __origScrollTo = window.scrollTo.bind(window);
-      window.scrollTo = (optsOrX, maybeY) => {
-        if (__DBG_ENABLED) {
-          let top = null;
-          let behavior = null;
-          if (typeof optsOrX === "object" && optsOrX) {
-            top = typeof optsOrX.top === "number" ? optsOrX.top : null;
-            behavior = typeof optsOrX.behavior === "string" ? optsOrX.behavior : null;
-          } else if (typeof optsOrX === "number") {
-            top = typeof maybeY === "number" ? maybeY : null;
-          }
-          // Keep stack short to avoid huge logs; enough to see caller.
-          const stack = new Error().stack?.split("\n").slice(0, 6).join("\n") || null;
-          __dlog("scrollTo", {
-            top,
-            behavior,
-            fromScrollY: window.scrollY,
-            mode,
-            entered,
-            snapAnimating,
-            wheelLock,
-            stack,
-          });
-        }
-        // Preserve overload semantics:
-        // - scrollTo({top, left, behavior})
-        // - scrollTo(x, y)
-        if (typeof optsOrX === "object" && optsOrX) return __origScrollTo(optsOrX);
-        return __origScrollTo(optsOrX, maybeY);
-      };
-    }
-  } catch {
-    // ignore
-  }
-  // #endregion
-
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isCoarsePointer =
     window.matchMedia?.("(pointer: coarse)").matches ||
@@ -280,19 +174,6 @@
 
     rebuildSnapPoints();
 
-    // #region agent log
-    __dlog("buildRanges", {
-      mode,
-      entered,
-      totalWeight: total,
-      overviewStart,
-      enterThreshold,
-      scrollY: window.scrollY,
-      maxScroll: Math.max(1, document.documentElement.scrollHeight - window.innerHeight),
-      snapPointsHead: snapPoints.slice(0, 5).map((s) => ({ scene: s.scene, p: Number(s.p.toFixed(6)) })),
-    });
-    // #endregion
-
     // Compute merged segments of scenes that have explicit backgrounds assigned.
     firstBgRange = null;
     bgSegments = [];
@@ -416,17 +297,6 @@
     const dur = duration ?? (prefersReduced ? 0 : 520);
     if (!Number.isFinite(endP)) return;
 
-    // #region agent log
-    __dlog("startSnapTo", {
-      startP: Number(startP.toFixed(6)),
-      endP: Number(endP.toFixed(6)),
-      dur,
-      snapTargetIndex,
-      snapAnimating,
-      wheelLock,
-    });
-    // #endregion
-
     if (Math.abs(endP - startP) < 0.0005 || dur <= 0) {
       snapAnimating = false;
       snapRAF = 0;
@@ -451,9 +321,6 @@
         wheelLock = false;
         lastP = -1;
         uiDirty = true;
-        // #region agent log
-        __dlog("snapComplete", { endP: Number(endP.toFixed(6)), scrollY: window.scrollY });
-        // #endregion
         requestAnimationFrame(render);
       }
     };
@@ -477,16 +344,6 @@
       ? Math.max(0, Math.min(snapPoints.length - 1, snapTargetIndex + (dir > 0 ? 1 : -1)))
       : findDirectionalSnapIndex(getProgress(), dir);
 
-    // #region agent log
-    __dlog("snapByDirection", {
-      dir,
-      p: Number(getProgress().toFixed(6)),
-      nextIndex,
-      nextScene: snapPoints[nextIndex]?.scene,
-      nextP: Number((snapPoints[nextIndex]?.p ?? 0).toFixed(6)),
-    });
-    // #endregion
-
     snapToIndex(nextIndex);
   }
 
@@ -508,16 +365,6 @@
         idx = lastNonHomeSnapIndex;
       }
     }
-
-    // #region agent log
-    __dlog("snapToNearest", {
-      p: Number(p.toFixed(6)),
-      idx,
-      idxScene: snapPoints[idx]?.scene,
-      idxP: Number((snapPoints[idx]?.p ?? 0).toFixed(6)),
-      head: snapPoints.slice(0, 4).map((s) => ({ scene: s.scene, p: Number(s.p.toFixed(6)) })),
-    });
-    // #endregion
 
     snapToIndex(idx);
   }
@@ -544,9 +391,6 @@
       const dir = wheelAccum > 0 ? 1 : -1;
       wheelAccum = 0;
       wheelLock = true;
-      // #region agent log
-      __dlog("wheelThreshold", { dir, delta, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
-      // #endregion
       snapByDirection(dir);
     }
   }
@@ -558,10 +402,6 @@
     snapSettleTimer = window.setTimeout(() => {
       snapToNearest();
     }, 140);
-
-    // #region agent log
-    __dlog("onScrollSettleSchedule", { scrollY: window.scrollY, p: Number(getProgress().toFixed(6)), wheelLock });
-    // #endregion
   }
 
   function onTouchStartSnap(e) {
@@ -617,16 +457,10 @@
       if (e.key === "PageDown" || e.key === "ArrowDown") {
         e.preventDefault();
         showRoadmapPeek();
-        // #region agent log
-        __dlog("keydown", { key: e.key, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
-        // #endregion
         snapByDirection(1);
       } else if (e.key === "PageUp" || e.key === "ArrowUp") {
         e.preventDefault();
         showRoadmapPeek();
-        // #region agent log
-        __dlog("keydown", { key: e.key, scrollY: window.scrollY, p: Number(getProgress().toFixed(6)) });
-        // #endregion
         snapByDirection(-1);
       }
     };
@@ -639,10 +473,6 @@
     if (!isCoarsePointer) {
       window.addEventListener("scroll", onScrollSettle, { passive: true, signal });
     }
-
-    // #region agent log
-    __dlog("bindScrollSnapping", { isCoarsePointer, prefersReduced });
-    // #endregion
   }
 
   function unbindScrollSnapping() {
@@ -1366,16 +1196,6 @@
 
     if (targetP == null) return;
 
-    // #region agent log
-    __dlog("jumpTo", {
-      scene,
-      pBefore: Number(getProgress().toFixed(6)),
-      targetP: Number(targetP.toFixed(6)),
-      snapIdx: snapPoints.findIndex((s) => s.scene === scene),
-      canSnapScroll: canSnapScroll(),
-    });
-    // #endregion
-
     // If the user uses the menu to jump *past* Addison’s Walk, don't force them to watch it.
     if (!addisonPlayed && addisonTriggerAt != null && targetP >= addisonTriggerAt) {
       addisonPlayed = true;
@@ -1398,9 +1218,6 @@
   for (const b of roadmapJumpBtns) {
     b.addEventListener("click", () => {
       const scene = b.getAttribute("data-roadmap-jump") || "home";
-      // #region agent log
-      __dlog("roadmapClick", { scene, pBefore: Number(getProgress().toFixed(6)), scrollY: window.scrollY });
-      // #endregion
       jumpTo(scene);
       // Clicking focuses the button; that keeps :focus-within on the dock, so labels stay open.
       // Blur on pointer/click so labels collapse again (keyboard users still get focus behavior).
