@@ -280,6 +280,7 @@
     const endP = clamp01(targetP);
     const dur = duration ?? (prefersReduced ? 0 : 520);
     if (!Number.isFinite(endP)) return;
+
     if (Math.abs(endP - startP) < 0.0005 || dur <= 0) {
       snapAnimating = false;
       snapRAF = 0;
@@ -322,12 +323,16 @@
     const nextIndex = snapAnimating
       ? Math.max(0, Math.min(snapPoints.length - 1, snapTargetIndex + (dir > 0 ? 1 : -1)))
       : findDirectionalSnapIndex(getProgress(), dir);
+
     snapToIndex(nextIndex);
   }
 
   function snapToNearest() {
     if (!snapPoints.length || !canSnapScroll()) return;
-    snapToIndex(findNearestSnapIndex(getProgress()));
+    const p = getProgress();
+    const idx = findNearestSnapIndex(p);
+
+    snapToIndex(idx);
   }
 
   function onWheelSnap(e) {
@@ -359,6 +364,7 @@
   function onScrollSettle() {
     if (!canSnapScroll() || snapAnimating) return;
     window.clearTimeout(snapSettleTimer);
+
     snapSettleTimer = window.setTimeout(() => {
       snapToNearest();
     }, 140);
@@ -404,11 +410,32 @@
     if (scrollAC) scrollAC.abort();
     scrollAC = new AbortController();
     const { signal } = scrollAC;
+    const onKeySnap = (e) => {
+      if (!canSnapScroll() || !snapPoints.length) return;
+      const target = e?.target;
+      if (
+        target &&
+        (target.isContentEditable ||
+          (typeof target.closest === "function" && target.closest("input, textarea, select, [contenteditable='true']")))
+      ) {
+        return;
+      }
+      if (e.key === "PageDown") {
+        e.preventDefault();
+        showRoadmapPeek();
+        snapByDirection(1);
+      } else if (e.key === "PageUp") {
+        e.preventDefault();
+        showRoadmapPeek();
+        snapByDirection(-1);
+      }
+    };
     window.addEventListener("wheel", onWheelSnap, { passive: false, signal });
     window.addEventListener("touchstart", onTouchStartSnap, { passive: true, signal });
     window.addEventListener("touchmove", onTouchMoveSnap, { passive: false, signal });
     window.addEventListener("touchend", onTouchEndSnap, { passive: true, signal });
     window.addEventListener("touchcancel", onTouchEndSnap, { passive: true, signal });
+    window.addEventListener("keydown", onKeySnap, { signal });
     if (!isCoarsePointer) {
       window.addEventListener("scroll", onScrollSettle, { passive: true, signal });
     }
@@ -1117,17 +1144,19 @@
       // Jump to just after trigger point so the interstitial runs.
       targetP = addisonTriggerAt + 0.001;
     } else {
-      // Jump *into* the scene (past fade-in) so the target panel is fully visible
-      // rather than landing on the black/transition edge.
-      const r = ranges.find((rr) => rr.el?.getAttribute?.("data-scene") === scene);
-      if (r) {
-        const span = Math.max(0.0001, r.end - r.start);
-        const fade = (prefersReduced ? span * 0.10 : span * 0.18);
-        const bump = Math.min(span * 0.35, fade * 1.25);
-        targetP = Math.min(r.end - 0.001, r.start + bump);
+      const snapIdx = snapPoints.findIndex((s) => s.scene === scene);
+      if (snapIdx >= 0) {
+        targetP = snapPoints[snapIdx].p;
       } else {
-        const start = sceneStartByName.get(scene);
-        if (start != null) targetP = start + 0.01;
+        // Fallback: Jump *into* the scene (past fade-in) so the target panel is fully visible
+        // rather than landing on the black/transition edge.
+        const r = ranges.find((rr) => rr.el?.getAttribute?.("data-scene") === scene);
+        if (r) {
+          targetP = snapPointForRange(r, scene);
+        } else {
+          const start = sceneStartByName.get(scene);
+          if (start != null) targetP = start + 0.01;
+        }
       }
     }
 
@@ -1136,6 +1165,14 @@
     // If the user uses the menu to jump *past* Addison’s Walk, don't force them to watch it.
     if (!addisonPlayed && addisonTriggerAt != null && targetP >= addisonTriggerAt) {
       addisonPlayed = true;
+    }
+
+    // Use snapping (when enabled) to avoid landing near section midpoints where settle-snapping
+    // could choose a different nearest target on different browsers/rounding.
+    const snapIdx = snapPoints.findIndex((s) => s.scene === scene);
+    if (snapIdx >= 0 && canSnapScroll()) {
+      snapToIndex(snapIdx);
+      return;
     }
 
     setProgress(targetP);

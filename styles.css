@@ -1323,7 +1323,43 @@ body.is-home .overlay__titleLine--b{
 
 @media (prefers-reduced-motion: reduce){
   .stage__grain{animation:none}
-  .intro__line{animation:none; opacity:1; transform:none; filter:none}
-  body.is-home .overlay__titleLine--a,
-  body.is-home .overlay__titleLine--b{animation:none}
+  /* Keep the intro quote staged (staggered), but avoid motion (no translate). */
+  .intro__line,
+  .intro__author{
+    transform: none;
+    animation-name: introLineInReduced;
+  }
+
+  /* Same timing/delays as `introLineIn`, but without movement. */
+  @keyframes introLineInReduced{
+    0%{opacity:0; filter: blur(12px)}
+    100%{opacity:1; filter: blur(0)}
+  }
+
+  /* Keep Enter staged too, but avoid motion. */
+  .intro__skip{
+    transform: none;
+    animation-name: introBtnInReduced;
+  }
+  @keyframes introBtnInReduced{
+    0%{opacity:0; filter: blur(12px); visibility:hidden; pointer-events:none}
+    99%{visibility:hidden; pointer-events:none}
+    100%{opacity:1; filter: blur(0); visibility:visible; pointer-events:auto}
+  }
+
+  /* Home title: preserve cinematic feel without transform motion (blur → sharp + gentle fade). */
+  body.is-home .overlay__titleLine{
+    opacity: 0;
+    filter: blur(12px);
+  }
+  body.is-home .overlay__titleLine--a{
+    animation-name: titleRevealReduced;
+  }
+  body.is-home .overlay__titleLine--b{
+    animation-name: titleRevealReduced;
+  }
+  @keyframes titleRevealReduced{
+    0%{opacity:0; filter: blur(14px)}
+    100%{opacity:1; filter: blur(0)}
+  }
 }
