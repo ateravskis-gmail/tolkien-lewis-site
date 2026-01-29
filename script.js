@@ -19,6 +19,7 @@
     // Short, non-identifying session id for correlating logs.
     return `scroll-debug-${Math.floor(Math.random() * 1e9).toString(36)}`;
   })();
+  const __DBG_BUILD_ID = "nar20";
   let __DBG_SEQ = 0;
   const __DBG_BUFFER = [];
   const __dlog = (tag, data) => {
@@ -51,7 +52,12 @@
     __DBG_BUFFER.length = 0;
   };
 
-  __dlog("debugEnabled", { href: window.location.href, userAgent: navigator.userAgent, viewport: { w: window.innerWidth, h: window.innerHeight } });
+  __dlog("debugEnabled", {
+    buildId: __DBG_BUILD_ID,
+    href: window.location.href,
+    userAgent: navigator.userAgent,
+    viewport: { w: window.innerWidth, h: window.innerHeight },
+  });
 
   // Capture programmatic scroll jumps (helps identify unexpected scrollTo calls).
   try {
