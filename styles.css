@@ -584,7 +584,6 @@ body.is-addison .stage__interstitial{
   font-weight: 700;
   font-size: 10px;
   color: rgba(255,255,255,.90);
-  text-shadow: 0 10px 40px rgba(0,0,0,.60);
 }
 .epCard__title{
   margin-top: 8px;
@@ -600,14 +599,12 @@ body.is-addison .stage__interstitial{
   margin-top: 6px;
   font-size: 12px;
   color: rgba(255,255,255,.92);
-  text-shadow: 0 10px 46px rgba(0,0,0,.62);
 }
 .epCard__body{
   margin-top: 12px;
   font-size: clamp(16px, .5vw + 14px, 18px);
   line-height: 1.62;
   color: rgba(255,255,255,.99);
-  text-shadow: 0 12px 54px rgba(0,0,0,.68);
   max-height: 0;
   opacity: 0;
   overflow:hidden;
@@ -773,14 +770,12 @@ body.is-addison .stage__interstitial{
   margin-top: 6px;
   font-size: 12px;
   color: rgba(255,255,255,.92);
-  text-shadow: 0 10px 46px rgba(0,0,0,.62);
 }
 .epSelected__body{
   margin-top: 10px;
   font-size: 14px;
   line-height: 1.48;
   color: rgba(255,255,255,.96);
-  text-shadow: 0 12px 54px rgba(0,0,0,.68);
 }
 .epChip{
   appearance:none;
