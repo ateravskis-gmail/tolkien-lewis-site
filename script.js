@@ -356,6 +356,20 @@
     return best;
   }
 
+  function findNearestNonHomeSnapIndex(p) {
+    if (snapPoints.length <= 1) return 0;
+    let best = 1;
+    let bestDist = Math.abs(snapPoints[1].p - p);
+    for (let i = 2; i < snapPoints.length; i++) {
+      const d = Math.abs(snapPoints[i].p - p);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    return best;
+  }
+
   function findDirectionalSnapIndex(p, dir) {
     const eps = 0.0005;
     if (dir > 0) {
@@ -454,7 +468,13 @@
   function snapToNearest() {
     if (!snapPoints.length || !canSnapScroll()) return;
     const p = getProgress();
-    const idx = findNearestSnapIndex(p);
+    let idx = findNearestSnapIndex(p);
+
+    // Home is special: don't "magnet" back to Home after the user has meaningfully started scrolling.
+    // This avoids accidental jump-backs on some browsers / reduced-motion where snaps are instantaneous.
+    if (idx === 0 && window.scrollY > 18) {
+      idx = findNearestNonHomeSnapIndex(p);
+    }
 
     // #region agent log
     __dlog("snapToNearest", {
