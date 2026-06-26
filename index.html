@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500..900&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=nar24" />
+    <link rel="stylesheet" href="./styles.css?v=nar25" />
   </head>
   <body>
     <!-- Right-side scroll roadmap (Apple Dock-inspired) -->
@@ -43,9 +43,17 @@
         <span class="roadmap__dot" aria-hidden="true"></span>
         <span class="roadmap__label">Approach</span>
       </button>
-      <button class="roadmap__item" type="button" data-roadmap-jump="episodes">
+      <button class="roadmap__item" type="button" data-roadmap-jump="story">
         <span class="roadmap__dot" aria-hidden="true"></span>
-        <span class="roadmap__label">Episodes</span>
+        <span class="roadmap__label">Story</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="investment">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Investment</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="proof">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Proof</span>
       </button>
       <button class="roadmap__item" type="button" data-roadmap-jump="contact">
         <span class="roadmap__dot" aria-hidden="true"></span>
@@ -116,6 +124,7 @@
         <div class="bg-slide" data-bg="ep3" style="background-image:url('./assets/Ep3.jpg')"></div>
         <div class="bg-slide" data-bg="ep4" style="background-image:url('./assets/Microphone.jpg')"></div>
         <div class="bg-slide" data-bg="ep5" style="background-image:url('./assets/ep5.jpg')"></div>
+        <div class="bg-slide" data-bg="proof" style="background-image:url('./BRHeroArt.jpg')"></div>
       </div>
 
       <video
@@ -234,8 +243,8 @@
               The creative friendship between Tolkien and Lewis offers an enduring and inspiring model of cultural
               leadership. We, too, face a cultural crisis: fresh assaults on the political, moral, and religious ideals
               that shaped Western civilization and made possible the American experiment in ordered freedom. By
-              exploring the lives and achievements of Tolkien and Lewis, our film
-              series will reveal how their shared moral vision created
+              exploring the lives and achievements of Tolkien and Lewis, our feature documentary will reveal how
+              their shared moral vision created
               a new beachhead for what philosopher Russel Kirk called “the permanent things” amid a deeply hostile
               culture.
             </p>
@@ -263,11 +272,11 @@
           <div class="facts facts--dark" aria-label="Format">
             <div class="fact">
               <div class="fact__k">Format</div>
-              <div class="fact__v">Five-part documentary series</div>
+              <div class="fact__v">Theatrical feature documentary</div>
             </div>
             <div class="fact">
-              <div class="fact__k">Total Run-time</div>
-              <div class="fact__v">About 90 minutes</div>
+              <div class="fact__k">Running Time</div>
+              <div class="fact__v">90 minutes</div>
             </div>
             <div class="fact">
               <div class="fact__k">Historian / Host</div>
@@ -278,28 +287,28 @@
         </div>
       </div>
 
-      <div class="overlay overlay--episodes" data-scene="episodes" data-len="3">
+      <div class="overlay overlay--episodes" data-scene="story" data-len="3">
 
-        <!-- Mobile: selected episode panel + filmstrip chooser -->
-        <div class="epSelected" data-ep-selected aria-label="Selected episode">
+        <!-- Mobile: selected story part panel + filmstrip chooser -->
+        <div class="epSelected" data-ep-selected aria-label="Selected story part">
           <div class="card card--panel epSelected__card">
-            <div class="card__label" data-ep-selected-tag>Episode</div>
+            <div class="card__label" data-ep-selected-tag>Story Part</div>
             <div class="epSelected__title" data-ep-selected-title></div>
             <div class="epSelected__years" data-ep-selected-years></div>
             <div class="epSelected__body" data-ep-selected-body></div>
           </div>
         </div>
-        <nav class="epFilmstrip" aria-label="Episode chooser">
-          <button class="epChip" type="button" data-ep-chip="1">EP1</button>
-          <button class="epChip" type="button" data-ep-chip="2">EP2</button>
-          <button class="epChip" type="button" data-ep-chip="3">EP3</button>
-          <button class="epChip" type="button" data-ep-chip="4">EP4</button>
-          <button class="epChip" type="button" data-ep-chip="5">EP5</button>
+        <nav class="epFilmstrip" aria-label="Story part chooser">
+          <button class="epChip" type="button" data-ep-chip="1">Part 1</button>
+          <button class="epChip" type="button" data-ep-chip="2">Part 2</button>
+          <button class="epChip" type="button" data-ep-chip="3">Part 3</button>
+          <button class="epChip" type="button" data-ep-chip="4">Part 4</button>
+          <button class="epChip" type="button" data-ep-chip="5">Part 5</button>
         </nav>
 
-        <nav class="episodesDock" aria-label="Episodes">
+        <nav class="episodesDock" aria-label="Story">
           <button class="epCard" type="button" data-ep="1">
-            <div class="epCard__tag">EPISODE 1</div>
+            <div class="epCard__tag">PART 1</div>
             <div class="epCard__title">THE END OF ILLUSIONS</div>
             <div class="epCard__years">(1914-1925)</div>
             <div class="epCard__body">
@@ -311,7 +320,7 @@
           </button>
 
           <button class="epCard" type="button" data-ep="2">
-            <div class="epCard__tag">EPISODE 2</div>
+            <div class="epCard__tag">PART 2</div>
             <div class="epCard__title">ENEMIES OF THE PERMANENT THINGS</div>
             <div class="epCard__years">(1926-1933)</div>
             <div class="epCard__body">
@@ -325,7 +334,7 @@
           </button>
 
           <button class="epCard" type="button" data-ep="3">
-            <div class="epCard__tag">EPISODE 3</div>
+            <div class="epCard__tag">PART 3</div>
             <div class="epCard__title">WHEN DRAGONS ROAM THE EARTH</div>
             <div class="epCard__years">(1933-1939)</div>
             <div class="epCard__body">
@@ -339,7 +348,7 @@
           </button>
 
           <button class="epCard" type="button" data-ep="4">
-            <div class="epCard__tag">EPISODE 4</div>
+            <div class="epCard__tag">PART 4</div>
             <div class="epCard__title">THE INKLINGS GO TO WAR</div>
             <div class="epCard__years">(1939-1942)</div>
             <div class="epCard__body">
@@ -352,7 +361,7 @@
           </button>
 
           <button class="epCard" type="button" data-ep="5">
-            <div class="epCard__tag">EPISODE 5</div>
+            <div class="epCard__tag">PART 5</div>
             <div class="epCard__title">THE FAR-OFF COUNTRY</div>
             <div class="epCard__years">(1942-1945)</div>
             <div class="epCard__body">
@@ -365,22 +374,138 @@
         </nav>
       </div>
 
+      <div class="overlay overlay--panel" data-scene="investment" data-len="2">
+        <div class="card card--panel card--financial">
+          <div class="financialLayout">
+            <figure class="financialPoster">
+              <img src="./W4ME%20Poster%20Small.jpg" alt="The War for Middle-Earth film poster" loading="lazy" />
+            </figure>
+
+            <div class="financialContent">
+              <div class="card__label">Investment Ask</div>
+              <div class="prose">
+                <p class="lead">
+                  We’re seeking <strong>$1 Million</strong> to produce the film and secure a limited theatrical
+                  release, followed by a Pay-1 window license at <strong>Wonder Project</strong> or
+                  <strong>Angel Studios</strong>.
+                </p>
+              </div>
+
+              <div class="financialTableWrap" aria-label="Downside base and breakout financial model">
+                <table class="financialTable">
+                  <thead>
+                    <tr>
+                      <th scope="col">Scenario</th>
+                      <th scope="col">Theatrical Gross</th>
+                      <th scope="col">Producer Theatrical Net</th>
+                      <th scope="col">Pay-1 Platform Value</th>
+                      <th scope="col">Other Revenue</th>
+                      <th scope="col">Total Project Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Downside</th>
+                      <td data-label="Theatrical Gross">$900K-$1.5M</td>
+                      <td data-label="Producer Theatrical Net">$150K-$350K</td>
+                      <td data-label="Pay-1 Platform Value">$350K-$600K</td>
+                      <td data-label="Other Revenue">$250K-$300K</td>
+                      <td data-label="Total Project Revenue">$750K-$1.25M</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Base</th>
+                      <td data-label="Theatrical Gross">$2.75M</td>
+                      <td data-label="Producer Theatrical Net">$1.0M</td>
+                      <td data-label="Pay-1 Platform Value">$1.1M</td>
+                      <td data-label="Other Revenue">$950K</td>
+                      <td data-label="Total Project Revenue">$3.05M</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Breakout</th>
+                      <td data-label="Theatrical Gross">$6M+</td>
+                      <td data-label="Producer Theatrical Net">$2.4M+</td>
+                      <td data-label="Pay-1 Platform Value">$2.5M+</td>
+                      <td data-label="Other Revenue">$2.6M+</td>
+                      <td data-label="Total Project Revenue">$7.5M+</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="financialFooter">
+                <p class="financialNote">
+                  Producer theatrical net assumes exhibitor share and P&amp;A recoupment.
+                </p>
+                <a
+                  class="card__btn financialDownload"
+                  href="./War%20for%20Middle%20Earth%20Financial%20Modeling.pdf"
+                  download
+                >
+                  Download Projections (PDF)
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="proof" data-len="2">
+        <div class="card card--panel card--proof">
+          <div class="proofLayout">
+            <figure class="proofPoster">
+              <img src="./B%20Rush%20Poster_Small.jpg" alt="Benjamin Rush film poster" loading="lazy" />
+            </figure>
+
+            <div class="proofContent">
+              <div class="proofEyebrow">
+                <span class="card__label">Distribution Proof</span>
+                <img
+                  class="proofLogo"
+                  src="./mobile-wonder-logo_xyzjih.svg"
+                  alt="Wonder Project on Prime Video"
+                  loading="lazy"
+                />
+              </div>
+              <div class="prose">
+                <p class="lead">
+                  Our film <strong>Benjamin Rush</strong> has been in the <strong>Top 10 on Wonder Project</strong>
+                  for two weeks.
+                </p>
+                <p>
+                  That momentum gives us a live proof point for this audience: historically grounded, faith-adjacent
+                  documentary storytelling can travel on the same platform path we’re targeting for
+                  <em>The War for Middle-Earth</em>.
+                </p>
+              </div>
+
+              <a
+                class="card__btn proofWatch"
+                href="https://www.amazon.com/gp/video/detail/B0GY9Z51B9/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Watch on Amazon
+              </a>
+            </div>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
       <div class="overlay overlay--panel" data-scene="contact">
         <div class="contactStack">
           <div class="card card--panel">
             <div class="card__label">Next step</div>
             <div class="prose">
               <p class="lead">
-                We’re seeking <strong>$500,000</strong> to bring this project to the screen.
-              </p>
-              <p>
                 If you’re interested in learning more, we’d love to share the timeline and production plan.
               </p>
             </div>
             <div class="card__actions">
               <a
                 class="card__btn"
-                href="mailto:joe@josephloconte.com?cc=andrew@noblestoryco.com,adam@noblestoryco.com&subject=I%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth&body=Hi%20Joe%2C%0A%0AI%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth.%0A%0ACould%20you%20share%20more%20details%20on%20the%20project%20scope%2C%20timeline%2C%20and%20how%20the%20%24500%2C000%20will%20be%20used%3F%0A%0AThank%20you%2C%0A%5BYour%20Name%5D"
+                href="mailto:joe@josephloconte.com?cc=andrew@noblestoryco.com,adam@noblestoryco.com&subject=I%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth&body=Hi%20Joe%2C%0A%0AI%27m%20interested%20in%20hearing%20more%20about%20The%20War%20for%20Middle-earth.%0A%0ACould%20you%20share%20more%20details%20on%20the%20project%20scope%2C%20timeline%2C%20and%20production%20plan%3F%0A%0AThank%20you%2C%0A%5BYour%20Name%5D"
               >
                 Email Team
               </a>
@@ -413,7 +538,7 @@
     <!-- Scroll controls a timeline; the visuals remain fixed to create “entering the field of view”. -->
     <div class="scrollspace" data-scrollspace aria-hidden="true"></div>
 
-    <script src="./script.js?v=nar24"></script>
+    <script src="./script.js?v=nar25"></script>
   </body>
 </html>
 

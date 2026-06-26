@@ -159,7 +159,7 @@
     const o1 = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "overview-1");
     const o3 = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "overview-3");
     const imperative = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "imperative");
-    const episodes = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "episodes");
+    const episodes = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "story");
     overviewBgRange = o1 && o3 ? { start: o1.start, end: o3.end } : null;
     overviewStart = o1?.start ?? 0;
     addisonTriggerAt = o3?.end ?? null;
@@ -228,7 +228,7 @@
     const span = Math.max(0.0001, r.end - r.start);
     const fade = prefersReduced ? span * 0.1 : span * 0.18;
     // Land past the fade-in window so the panel is fully visible at each stop.
-    // (Episodes is a longer scene; a hard cap here caused snapping before fade-in finished.)
+    // (Story is a longer scene; a hard cap here caused snapping before fade-in finished.)
     const bump = Math.min(span * 0.35, fade * 1.25);
     const extra = scene === "overview-1" ? Math.min(span * 0.22, 0.028) : 0;
     return Math.min(r.end - 0.001, r.start + bump + extra);
@@ -650,7 +650,7 @@
     if (homeVideo) homeVideo.style.opacity = isHomePhase ? String(0.92 * (1 - bgFade)) : "0";
     if (mapVideo) mapVideo.style.opacity = !isHomePhase ? String(0.92 * (1 - bgFade)) : "0";
 
-    // Episodes dock behavior: hover expands + background swaps, auto-open Ep1 on first entry.
+    // Story dock behavior: hover expands + background swaps, auto-open Part 1 on first entry.
     if (episodesRange) {
       const vEp = visForRange(p, episodesRange.start, episodesRange.end, { holdLast: false });
       const inEp = vEp > 0.12;
@@ -660,18 +660,18 @@
       }
       if (!inEp) hoverEp = null;
 
-      // Locked episode is only used when not hovering any other card.
+      // Locked story part is only used when not hovering any other card.
       const active = hoverEp ?? selectedEp;
       for (const card of epCards) {
         const isActive = card.getAttribute("data-ep") === active && inEp;
         card.classList.toggle("is-active", isActive);
       }
 
-      // Mobile episodes: render selected episode into the dedicated panel + highlight chips.
+      // Mobile story: render selected part into the dedicated panel + highlight chips.
       if (inEp && epSelected && epSelectedTitle && epSelectedBody) {
         const src = epCards.find((c) => c.getAttribute("data-ep") === selectedEp);
         if (src) {
-          const tag = qs(".epCard__tag", src)?.textContent?.trim() || `EPISODE ${selectedEp}`;
+          const tag = qs(".epCard__tag", src)?.textContent?.trim() || `PART ${selectedEp}`;
           const title = qs(".epCard__title", src)?.textContent?.trim() || "";
           const years = qs(".epCard__years", src)?.textContent?.trim() || "";
           const body = qs(".epCard__body", src)?.textContent?.trim() || "";
@@ -689,15 +689,15 @@
         }
       }
 
-      // Ensure the background layer is visible during Episodes (ep backgrounds are not timeline scenes).
+      // Ensure the background layer is visible during Story (part backgrounds are not timeline scenes).
       if (inEp) {
         if (bgSlidesWrap) bgSlidesWrap.style.opacity = "1";
         if (homeVideo) homeVideo.style.opacity = "0";
         if (mapVideo) mapVideo.style.opacity = "0";
       }
 
-      // Background swapping for episodes: use ep1..ep5 backgrounds driven by active episode,
-      // but only while we're in the episodes scene.
+      // Background swapping for story parts: use ep1..ep5 backgrounds driven by the active part,
+      // but only while we're in the story scene.
       for (let i = 1; i <= 5; i++) {
         const key = `ep${i}`;
         const el = bgByScene.get(key);
@@ -1296,7 +1296,7 @@
     if (skipBtn) skipBtn.onclick = skip;
   }
 
-  // Episodes dock interactions
+  // Story dock interactions
   for (const card of epCards) {
     const ep = card.getAttribute("data-ep") || "1";
     card.addEventListener("mouseenter", () => {

@@ -527,7 +527,7 @@ body.is-addison .stage__interstitial{
 .overlay{will-change: transform, opacity}
 .overlay{z-index: 30}
 
-/* Episodes dock (bottom cards + hover expand) */
+/* Story dock (bottom cards + hover expand) */
 .overlay--episodes{
   display:block;
   pointer-events:none;
@@ -625,7 +625,7 @@ body.is-addison .stage__interstitial{
 }
 
 @media (max-width: 980px){
-  /* Episodes: switch to swipeable horizontal dock on small screens */
+  /* Story: switch to swipeable horizontal dock on small screens */
   .episodesDock{
     display:flex;
     gap: 12px;
@@ -652,7 +652,7 @@ body.is-addison .stage__interstitial{
   }
 }
 
-/* Episodes: selected episode panel + filmstrip (hidden by default; enabled on touch/small screens) */
+/* Story: selected part panel + filmstrip (hidden by default; enabled on touch/small screens) */
 .epSelected{
   display:none;
   pointer-events:none;
@@ -678,7 +678,7 @@ body.is-addison .stage__interstitial{
   z-index: 36;
 }
 
-/* --- Mobile readability mode + Episodes filmstrip */
+/* --- Mobile readability mode + Story filmstrip */
 @media (max-width: 720px){
   /* Shrink typography/padding so each panel fits a phone viewport more reliably. */
   body{font-size: 14px}
@@ -705,7 +705,6 @@ body.is-addison .stage__interstitial{
   }
   .facts--dark .fact{padding: 10px 12px}
   .facts--dark .fact__v{font-size: 14px}
-
   /* Overview portraits: keep them much smaller on phones to preserve vertical space. */
   .portraits{
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -739,7 +738,7 @@ body.is-addison .stage__interstitial{
     line-height: 1.36;
   }
 
-  /* Episodes: mobile filmstrip picker + selected episode display */
+  /* Story: mobile filmstrip picker + selected part display */
   .episodesTop{display:none}
   .episodesDock{display:none}
   .epSelected{display:grid}
@@ -938,6 +937,27 @@ body.is-home .overlay__titleLine--b{
   width:min(980px, 100%);
   padding: clamp(22px, 2.2vw, 30px);
 }
+.card--financial{
+  width:min(1140px, 100%);
+}
+.card--proof{
+  width:min(1080px, 100%);
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(900px 320px at 20% 0%, rgba(255,255,255,.09), transparent 60%),
+    linear-gradient(180deg, rgba(58,58,58,.88), rgba(34,34,34,.88));
+}
+@media (min-width: 981px){
+  .card--financial{
+    width:min(1040px, calc(100% - 112px));
+    margin-right: 112px;
+  }
+  .card--proof{
+    width:min(1000px, calc(100% - 112px));
+    margin-right: 112px;
+  }
+}
 
 /* Subtle readability boost on the busiest backgrounds (keep it understated). */
 @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
@@ -1058,6 +1078,256 @@ body.is-home .overlay__titleLine--b{
 }
 .card__btn:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.24)}
 .card__actions{margin-top: 14px}
+
+/* Investment ask: compact scenario model */
+.financialLayout{
+  display:grid;
+  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items:start;
+}
+.financialPoster{
+  margin:0;
+  align-self:start;
+}
+.financialPoster img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit: contain;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 28px 90px rgba(0,0,0,.58);
+}
+.financialContent{
+  min-width:0;
+}
+.financialTableWrap{
+  margin-top: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(900px 260px at 20% 0%, rgba(255,255,255,.06), transparent 60%),
+    rgba(0,0,0,.24);
+  overflow:hidden;
+}
+.financialTable{
+  width:100%;
+  border-collapse: collapse;
+  font-size: clamp(12px, .32vw + 11px, 14px);
+  line-height: 1.35;
+}
+.financialTable th,
+.financialTable td{
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  text-align:left;
+  vertical-align: top;
+}
+.financialTable thead th{
+  font-family: var(--font-title);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: 10px;
+  color: rgba(255,255,255,.66);
+  background: rgba(0,0,0,.22);
+}
+.financialTable tbody th{
+  font-family: var(--font-title);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: 11px;
+  color: rgba(255,255,255,.92);
+  white-space: nowrap;
+}
+.financialTable tbody td{
+  color: rgba(255,255,255,.84);
+  font-weight: 650;
+}
+.financialTable tbody tr:last-child th,
+.financialTable tbody tr:last-child td{
+  border-bottom: 0;
+}
+.financialTable tbody tr:nth-child(2){
+  background: rgba(255,255,255,.045);
+}
+.financialTable tbody tr:nth-child(3){
+  background:
+    radial-gradient(720px 160px at 0% 50%, rgba(255,150,84,.10), transparent 60%),
+    rgba(255,255,255,.02);
+}
+.financialNote{
+  margin: 0;
+  color: rgba(255,255,255,.58);
+  font-size: 13px;
+  line-height: 1.46;
+}
+.financialFooter{
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.financialDownload{
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+@media (max-width: 980px){
+  .financialLayout{
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+@media (max-width: 720px){
+  .card--financial{padding: 14px}
+  .financialLayout{
+    grid-template-columns: 1fr;
+  }
+  .financialPoster{
+    width:min(170px, 48vw);
+    justify-self:center;
+  }
+  .financialPoster img{
+    height:auto;
+    max-height:none;
+    aspect-ratio: 2 / 3;
+  }
+  .financialTableWrap{
+    margin-top: 10px;
+    border: 0;
+    background: transparent;
+  }
+  .financialTable,
+  .financialTable thead,
+  .financialTable tbody,
+  .financialTable tr,
+  .financialTable th,
+  .financialTable td{
+    display:block;
+  }
+  .financialTable thead{display:none}
+  .financialTable tr{
+    margin-bottom: 8px;
+    padding: 10px 10px 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.22);
+  }
+  .financialTable tbody tr:nth-child(2),
+  .financialTable tbody tr:nth-child(3){
+    background: rgba(0,0,0,.26);
+  }
+  .financialTable th,
+  .financialTable td{
+    padding: 0;
+    border-bottom: 0;
+  }
+  .financialTable tbody th{
+    margin-bottom: 6px;
+    font-size: 10px;
+  }
+  .financialTable td{
+    display:flex;
+    justify-content:space-between;
+    gap: 12px;
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  .financialTable td::before{
+    content: attr(data-label);
+    color: rgba(255,255,255,.55);
+    font-weight: 500;
+  }
+  .financialNote{
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .financialFooter{
+    align-items:stretch;
+    flex-direction:column;
+    margin-top: 8px;
+  }
+  .financialDownload{
+    width:100%;
+  }
+}
+
+/* Benjamin Rush proof point */
+.proofLayout,
+.card--proof .scrollPrompt{
+  position:relative;
+  z-index:1;
+}
+.proofLayout{
+  display:grid;
+  grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 30px);
+  align-items:center;
+}
+.proofPoster{
+  margin:0;
+}
+.proofPoster img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 34px 110px rgba(0,0,0,.70);
+}
+.proofContent{
+  min-width:0;
+  max-width: 680px;
+}
+.proofEyebrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.proofEyebrow .card__label{
+  margin-bottom:0;
+}
+.proofLogo{
+  width: min(150px, 34vw);
+  height:auto;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.34);
+  box-shadow: 0 22px 70px rgba(0,0,0,.44);
+}
+.proofWatch{
+  margin-top: 16px;
+}
+@media (max-width: 720px){
+  .card--proof{padding: 14px}
+  .proofLayout{
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .proofPoster{
+    width:min(150px, 44vw);
+    justify-self:center;
+  }
+  .proofEyebrow{
+    align-items:flex-start;
+    flex-direction:column;
+    gap: 8px;
+  }
+  .proofLogo{
+    width: min(132px, 42vw);
+    padding: 6px 8px;
+  }
+  .proofWatch{
+    width:100%;
+    margin-top: 10px;
+  }
+}
 
 /* Contact CTA: external links (glassmorphism pills) */
 .contactStack{
