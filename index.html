@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500..900&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=nar25" />
+    <link rel="stylesheet" href="./styles.css?v=nar26" />
   </head>
   <body>
     <!-- Right-side scroll roadmap (Apple Dock-inspired) -->
@@ -50,6 +50,10 @@
       <button class="roadmap__item" type="button" data-roadmap-jump="investment">
         <span class="roadmap__dot" aria-hidden="true"></span>
         <span class="roadmap__label">Investment</span>
+      </button>
+      <button class="roadmap__item" type="button" data-roadmap-jump="why-now">
+        <span class="roadmap__dot" aria-hidden="true"></span>
+        <span class="roadmap__label">Why Now</span>
       </button>
       <button class="roadmap__item" type="button" data-roadmap-jump="proof">
         <span class="roadmap__dot" aria-hidden="true"></span>
@@ -119,11 +123,12 @@
         <video class="bg-video" data-bg="approach" muted loop playsinline preload="metadata">
           <source src="./assets/OxfordBG.mp4?v=nar17" type="video/mp4" />
         </video>
-        <div class="bg-slide" data-bg="ep1" style="background-image:url('./assets/WWI_soldiers.jpg')"></div>
-        <div class="bg-slide" data-bg="ep2" style="background-image:url('./assets/Ep2.jpg')"></div>
-        <div class="bg-slide" data-bg="ep3" style="background-image:url('./assets/Ep3.jpg')"></div>
-        <div class="bg-slide" data-bg="ep4" style="background-image:url('./assets/Microphone.jpg')"></div>
-        <div class="bg-slide" data-bg="ep5" style="background-image:url('./assets/ep5.jpg')"></div>
+        <div class="bg-slide" data-bg="ep1" style="background-image:url('./assets/Ep2.jpg')"></div>
+        <div class="bg-slide" data-bg="ep2" style="background-image:url('./assets/Ep3.jpg')"></div>
+        <div class="bg-slide" data-bg="ep3" style="background-image:url('./assets/Microphone.jpg')"></div>
+        <div class="bg-slide" data-bg="ep4" style="background-image:url('./assets/ep5.jpg')"></div>
+        <div class="bg-slide" data-bg="investment" style="background-image:url('./assets/WWI_soldiers.jpg')"></div>
+        <div class="bg-slide" data-bg="why-now" style="background-image:url('./assets/1236642_Fantastic+Beasts+and+Where+To+Find+Them+bts+2.jpg')"></div>
         <div class="bg-slide" data-bg="proof" style="background-image:url('./BRHeroArt.jpg')"></div>
       </div>
 
@@ -161,12 +166,12 @@
 
       <div class="overlay overlay--title" data-layer="title">
         <div class="overlay__inner">
-          <div class="overlay__kicker">DOCUMENTARY FILM PROJECT</div>
+          <div class="overlay__kicker">THEATRICAL DOCUMENTARY FEATURE</div>
           <h1 class="overlay__title">
             <span class="overlay__titleLine overlay__titleLine--a">THE WAR FOR</span><br />
             <span class="overlay__titleLine overlay__titleLine--b">MIDDLE-EARTH</span>
           </h1>
-          <p class="overlay__sub">An untold story about war, friendship, and imagination.</p>
+          <p class="overlay__sub">J.R.R. Tolkien, C.S. Lewis, and the Fight for Civilization</p>
           <div class="overlay__prompt" aria-hidden="true">
             Scroll to enter the story
           </div>
@@ -303,24 +308,11 @@
           <button class="epChip" type="button" data-ep-chip="2">Part 2</button>
           <button class="epChip" type="button" data-ep-chip="3">Part 3</button>
           <button class="epChip" type="button" data-ep-chip="4">Part 4</button>
-          <button class="epChip" type="button" data-ep-chip="5">Part 5</button>
         </nav>
 
         <nav class="episodesDock" aria-label="Story">
           <button class="epCard" type="button" data-ep="1">
             <div class="epCard__tag">PART 1</div>
-            <div class="epCard__title">THE END OF ILLUSIONS</div>
-            <div class="epCard__years">(1914-1925)</div>
-            <div class="epCard__body">
-              We explore the “myth of progress” that gripped the generation of Tolkien and Lewis at the outbreak of the first World War. 
-              We learn about their literary interests and experiences in these years. We watch them go off to
-              fight in the trenches of France and learn about the devastating impact of the war on their lives and on
-              their entire generation.
-            </div>
-          </button>
-
-          <button class="epCard" type="button" data-ep="2">
-            <div class="epCard__tag">PART 2</div>
             <div class="epCard__title">ENEMIES OF THE PERMANENT THINGS</div>
             <div class="epCard__years">(1926-1933)</div>
             <div class="epCard__body">
@@ -333,8 +325,8 @@
             </div>
           </button>
 
-          <button class="epCard" type="button" data-ep="3">
-            <div class="epCard__tag">PART 3</div>
+          <button class="epCard" type="button" data-ep="2">
+            <div class="epCard__tag">PART 2</div>
             <div class="epCard__title">WHEN DRAGONS ROAM THE EARTH</div>
             <div class="epCard__years">(1933-1939)</div>
             <div class="epCard__body">
@@ -347,8 +339,8 @@
             </div>
           </button>
 
-          <button class="epCard" type="button" data-ep="4">
-            <div class="epCard__tag">PART 4</div>
+          <button class="epCard" type="button" data-ep="3">
+            <div class="epCard__tag">PART 3</div>
             <div class="epCard__title">THE INKLINGS GO TO WAR</div>
             <div class="epCard__years">(1939-1942)</div>
             <div class="epCard__body">
@@ -360,8 +352,8 @@
             </div>
           </button>
 
-          <button class="epCard" type="button" data-ep="5">
-            <div class="epCard__tag">PART 5</div>
+          <button class="epCard" type="button" data-ep="4">
+            <div class="epCard__tag">PART 4</div>
             <div class="epCard__title">THE FAR-OFF COUNTRY</div>
             <div class="epCard__years">(1942-1945)</div>
             <div class="epCard__body">
@@ -397,7 +389,7 @@
                     <tr>
                       <th scope="col">Scenario</th>
                       <th scope="col">Theatrical Gross</th>
-                      <th scope="col">Producer Theatrical Net</th>
+                      <th scope="col">Theatrical Net</th>
                       <th scope="col">Pay-1 Platform Value</th>
                       <th scope="col">Other Revenue</th>
                       <th scope="col">Total Project Revenue</th>
@@ -407,15 +399,15 @@
                     <tr>
                       <th scope="row">Downside</th>
                       <td data-label="Theatrical Gross">$900K-$1.5M</td>
-                      <td data-label="Producer Theatrical Net">$150K-$350K</td>
+                      <td data-label="Theatrical Net">$150K-$350K</td>
                       <td data-label="Pay-1 Platform Value">$350K-$600K</td>
                       <td data-label="Other Revenue">$250K-$300K</td>
                       <td data-label="Total Project Revenue">$750K-$1.25M</td>
                     </tr>
-                    <tr>
+                    <tr class="financialTable__baseCase">
                       <th scope="row">Base</th>
                       <td data-label="Theatrical Gross">$2.75M</td>
-                      <td data-label="Producer Theatrical Net">$1.0M</td>
+                      <td data-label="Theatrical Net">$1.0M</td>
                       <td data-label="Pay-1 Platform Value">$1.1M</td>
                       <td data-label="Other Revenue">$950K</td>
                       <td data-label="Total Project Revenue">$3.05M</td>
@@ -423,7 +415,7 @@
                     <tr>
                       <th scope="row">Breakout</th>
                       <td data-label="Theatrical Gross">$6M+</td>
-                      <td data-label="Producer Theatrical Net">$2.4M+</td>
+                      <td data-label="Theatrical Net">$2.4M+</td>
                       <td data-label="Pay-1 Platform Value">$2.5M+</td>
                       <td data-label="Other Revenue">$2.6M+</td>
                       <td data-label="Total Project Revenue">$7.5M+</td>
@@ -443,6 +435,48 @@
                 >
                   Download Projections (PDF)
                 </a>
+              </div>
+            </div>
+          </div>
+          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
+        </div>
+      </div>
+
+      <div class="overlay overlay--panel" data-scene="why-now" data-len="2">
+        <div class="card card--panel card--whyNow">
+          <div class="whyNowLayout">
+            <figure class="whyNowImage">
+              <img
+                src="./assets/meryl-streep-aslan-narnia.jpg"
+                alt="Meryl Streep and Aslan from Deadline's Narnia casting report"
+                loading="lazy"
+              />
+              <figcaption>Image: Deadline / Getty / Everett</figcaption>
+            </figure>
+
+            <div class="whyNowContent">
+              <div class="card__label">Why Now</div>
+              <div class="prose">
+                <p class="lead">
+                  The time is now: the pillars of Western Civilization are under siege like never before.
+                </p>
+                <p>
+                  <a
+                    href="https://deadline.com/2025/04/meryl-streep-aslan-greta-gerwig-netflix-narnia-movie-1236358278/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >Deadline reports</a>
+                  that Meryl Streep has been cast as Aslan in Greta Gerwig's <em>The Magician's Nephew</em>, with outside reporting
+                  saying that Aslan will be portrayed as female.
+                </p>
+                <p>
+                  For Lewis’s readers, Aslan is not just a beloved character but the moral and theological center of
+                  Narnia. A modernist reinterpretation is almost certain to trigger yet another cultural firestorm.
+                </p>
+              </div>
+
+              <div class="whyNowCallout">
+                That controversy creates an important opening for <em>The War for Middle-Earth</em>: a timely and important film about the shared moral vision of Tolkien and Lewis and how it influenced their work.
               </div>
             </div>
           </div>
@@ -477,6 +511,7 @@
                   documentary storytelling can travel on the same platform path we’re targeting for
                   <em>The War for Middle-Earth</em>.
                 </p>
+                <h3>Plus, our Top 10 ranking unlocks a performance clause to discuss licensing another film to Wonder.</h3>
               </div>
 
               <a

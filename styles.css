@@ -549,7 +549,7 @@ body.is-addison .stage__interstitial{
   bottom: 22px;
   padding: 0 18px;
   display:grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   align-items:end;
   pointer-events:auto;
@@ -615,6 +615,9 @@ body.is-addison .stage__interstitial{
 .epCard:hover{
   transform: translateY(-6px);
   border-color: rgba(255,255,255,.28);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .epCard.is-active .epCard__body,
 .epCard:hover .epCard__body{
@@ -754,6 +757,12 @@ body.is-addison .stage__interstitial{
 }
 .epSelected__card{
   width:min(980px, 100%);
+  max-height: calc(100vh - 148px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 148px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  pointer-events:auto;
 }
 .epSelected__title{
   margin-top: 8px;
@@ -940,6 +949,14 @@ body.is-home .overlay__titleLine--b{
 .card--financial{
   width:min(1140px, 100%);
 }
+.card--whyNow{
+  width:min(1080px, 100%);
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(900px 320px at 18% 0%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(43,31,24,.88), rgba(13,12,12,.90));
+}
 .card--proof{
   width:min(1080px, 100%);
   position:relative;
@@ -951,6 +968,10 @@ body.is-home .overlay__titleLine--b{
 @media (min-width: 981px){
   .card--financial{
     width:min(1040px, calc(100% - 112px));
+    margin-right: 112px;
+  }
+  .card--whyNow{
+    width:min(1000px, calc(100% - 112px));
     margin-right: 112px;
   }
   .card--proof{
@@ -1150,8 +1171,19 @@ body.is-home .overlay__titleLine--b{
 .financialTable tbody tr:last-child td{
   border-bottom: 0;
 }
-.financialTable tbody tr:nth-child(2){
-  background: rgba(255,255,255,.045);
+.financialTable tbody tr.financialTable__baseCase{
+  background:
+    radial-gradient(760px 180px at 6% 50%, rgba(255,196,112,.18), transparent 62%),
+    linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.045));
+}
+.financialTable tbody tr.financialTable__baseCase th,
+.financialTable tbody tr.financialTable__baseCase td{
+  color: rgba(255,255,255,.98);
+  font-weight: 820;
+  text-shadow: 0 0 22px rgba(255,196,112,.24);
+}
+.financialTable tbody tr.financialTable__baseCase td{
+  font-size: 1.08em;
 }
 .financialTable tbody tr:nth-child(3){
   background:
@@ -1174,6 +1206,24 @@ body.is-home .overlay__titleLine--b{
 .financialDownload{
   flex: 0 0 auto;
   margin-top: 0;
+  padding: 12px 15px;
+  border-color: rgba(255,196,112,.34);
+  background:
+    radial-gradient(460px 160px at 20% 0%, rgba(255,196,112,.20), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.07));
+  color: rgba(255,255,255,.96);
+  box-shadow: 0 18px 54px rgba(0,0,0,.42), 0 0 34px rgba(255,196,112,.14);
+  font-weight: 820;
+  letter-spacing: .16em;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.financialDownload:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,196,112,.54);
+  background:
+    radial-gradient(460px 160px at 20% 0%, rgba(255,196,112,.28), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.09));
+  box-shadow: 0 22px 70px rgba(0,0,0,.50), 0 0 44px rgba(255,196,112,.22);
 }
 @media (max-width: 980px){
   .financialLayout{
@@ -1220,6 +1270,12 @@ body.is-home .overlay__titleLine--b{
   .financialTable tbody tr:nth-child(3){
     background: rgba(0,0,0,.26);
   }
+  .financialTable tbody tr.financialTable__baseCase{
+    border-color: rgba(255,196,112,.26);
+    background:
+      radial-gradient(560px 150px at 0% 50%, rgba(255,196,112,.18), transparent 62%),
+      rgba(0,0,0,.30);
+  }
   .financialTable th,
   .financialTable td{
     padding: 0;
@@ -1252,6 +1308,97 @@ body.is-home .overlay__titleLine--b{
   }
   .financialDownload{
     width:100%;
+  }
+}
+
+/* Why Now: Netflix Narnia timing */
+.whyNowLayout,
+.card--whyNow .scrollPrompt{
+  position:relative;
+  z-index:1;
+}
+.whyNowLayout{
+  display:grid;
+  grid-template-columns: minmax(260px, 390px) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 34px);
+  align-items:center;
+}
+.whyNowImage{
+  margin:0;
+  border-radius: 20px;
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.28);
+  box-shadow: 0 34px 110px rgba(0,0,0,.68);
+}
+.whyNowImage img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  filter: saturate(.88) contrast(1.05) brightness(.92);
+}
+.whyNowImage figcaption{
+  padding: 10px 12px 11px;
+  font-family: var(--font-title);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: rgba(255,255,255,.58);
+  background: rgba(0,0,0,.36);
+}
+.whyNowContent{
+  min-width:0;
+}
+.whyNowContent .prose a{
+  color: rgba(255,255,255,.92);
+  text-decoration-color: rgba(255,255,255,.36);
+  text-underline-offset: 3px;
+  pointer-events:auto;
+}
+.whyNowContent .prose a:hover{
+  text-decoration-color: rgba(255,255,255,.70);
+}
+.whyNowCallout{
+  margin-top: 16px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.16);
+  background:
+    radial-gradient(700px 220px at 0% 50%, rgba(255,150,84,.15), transparent 62%),
+    rgba(0,0,0,.28);
+  color: rgba(255,255,255,.88);
+  font-size: clamp(19px, 1.05vw + 15px, 23px);
+  line-height: 1.48;
+  font-weight: 650;
+  text-shadow: 0 24px 90px rgba(0,0,0,.70);
+}
+@media (max-width: 840px){
+  .whyNowLayout{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .whyNowImage{
+    width:min(480px, 100%);
+    justify-self:center;
+  }
+}
+@media (max-width: 720px){
+  .card--whyNow{padding: 14px}
+  .whyNowImage{
+    width:min(280px, 76vw);
+  }
+  .whyNowImage figcaption{
+    padding: 7px 9px 8px;
+    font-size: 7px;
+    letter-spacing: .12em;
+  }
+  .whyNowCallout{
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.38;
   }
 }
 

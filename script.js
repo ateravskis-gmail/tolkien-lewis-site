@@ -79,6 +79,7 @@
   let wheelLock = false;
   let touchStart = null;
   let touchLast = null;
+  let touchPanelScrolled = false;
   let scrollAC = null;
   let skipLockTimer = 0;
   let roadmapPeekTimer = 0;
@@ -222,6 +223,19 @@
 
   function canSnapScroll() {
     return mode === "home" && entered && !document.body.classList.contains("is-addison");
+  }
+
+  function getScrollableStoryPanel(target) {
+    if (!target || typeof target.closest !== "function") return null;
+    return target.closest(".epCard, .epSelected__card");
+  }
+
+  function canScrollWithin(el, deltaY) {
+    if (!el || !Number.isFinite(deltaY) || deltaY === 0) return false;
+    const maxScrollTop = el.scrollHeight - el.clientHeight;
+    if (maxScrollTop <= 1) return false;
+    if (deltaY > 0) return el.scrollTop < maxScrollTop - 1;
+    return el.scrollTop > 1;
   }
 
   function snapPointForRange(r, scene) {
@@ -372,6 +386,7 @@
   function onWheelSnap(e) {
     if (!canSnapScroll() || !snapPoints.length) return;
     if (e.ctrlKey) return;
+    if (canScrollWithin(getScrollableStoryPanel(e.target), e.deltaY)) return;
     if (snapAnimating || wheelLock) {
       e.preventDefault();
       return;
@@ -409,12 +424,19 @@
     const t = e.touches[0];
     touchStart = { x: t.clientX, y: t.clientY };
     touchLast = { x: t.clientX, y: t.clientY };
+    touchPanelScrolled = false;
     roadmapPeekTouchShown = false;
   }
 
   function onTouchMoveSnap(e) {
     if (!canSnapScroll() || !touchStart || !e.touches || e.touches.length !== 1) return;
     const t = e.touches[0];
+    const panelScrollDelta = touchLast ? touchLast.y - t.clientY : 0;
+    if (canScrollWithin(getScrollableStoryPanel(e.target), panelScrollDelta)) {
+      touchLast = { x: t.clientX, y: t.clientY };
+      touchPanelScrolled = true;
+      return;
+    }
     touchLast = { x: t.clientX, y: t.clientY };
     const dx = touchLast.x - touchStart.x;
     const dy = touchLast.y - touchStart.y;
@@ -430,10 +452,17 @@
 
   function onTouchEndSnap() {
     if (!canSnapScroll() || !touchStart || !touchLast) return;
+    if (touchPanelScrolled) {
+      touchStart = null;
+      touchLast = null;
+      touchPanelScrolled = false;
+      return;
+    }
     const dx = touchLast.x - touchStart.x;
     const dy = touchLast.y - touchStart.y;
     touchStart = null;
     touchLast = null;
+    touchPanelScrolled = false;
     if (Math.abs(dy) < Math.abs(dx)) return;
     if (Math.abs(dy) < 12) return;
     const dir = dy > 0 ? -1 : 1;
@@ -488,6 +517,7 @@
     wheelAccum = 0;
     touchStart = null;
     touchLast = null;
+    touchPanelScrolled = false;
   }
 
   function tryPlay(video) {
@@ -696,9 +726,9 @@
         if (mapVideo) mapVideo.style.opacity = "0";
       }
 
-      // Background swapping for story parts: use ep1..ep5 backgrounds driven by the active part,
+      // Background swapping for story parts: use ep1..ep4 backgrounds driven by the active part,
       // but only while we're in the story scene.
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 4; i++) {
         const key = `ep${i}`;
         const el = bgByScene.get(key);
         if (!el) continue;
@@ -897,151 +927,54 @@
       requestAnimationFrame(render);
     };
 
+    let skipArmedLocal = false;
+    window.setTimeout(() => {
+      skipArmedLocal = true;
+    }, 250);
+
     addisonVideo.loop = false;
-    // Start muted by default; we'll attempt to enable audio on a user gesture.
-    addisonVideo.muted = true;
-    addisonVideo.volume = 0;
+    addisonVideo.muted = false;
+    addisonVideo.volume = 1;
     addisonVideo.currentTime = 0;
     setCursorForVideo(addisonVideo);
+    tryPlay(addisonVideo);
 
-    // Mobile browsers (especially iOS Safari) will not autoplay *unmuted* video without a user gesture.
-    // To avoid stalling on a black frame, autoplay muted immediately, then use the first tap to enable audio.
-    let started = false;
-    let hasAudio = false;
-    let skipArmedLocal = false;
-    const armSkip = () => {
-      skipArmedLocal = false;
-      window.setTimeout(() => {
-        skipArmedLocal = true;
-      }, 450);
-    };
-
-    const startMutedAutoplay = () => {
-      if (started) return;
-      started = true;
-      // Ensure muted autoplay is allowed.
-      addisonVideo.muted = true;
-      addisonVideo.volume = 0;
-      addisonVideo.setAttribute("muted", "");
-      tryPlay(addisonVideo);
-      armSkip();
-      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
-      setUnmuteOverlay({ show: true, text: "Tap to unmute" });
-    };
-
-    const enableAudio = () => {
-      // On desktop we may already be playing (muted) without having set `started`.
-      // Allow unmute regardless so the overlay always works.
-      if (!started) started = true;
-      if (hasAudio) return;
-      // Attempt to unmute within a user-gesture handler.
-      addisonVideo.muted = false;
-      addisonVideo.volume = 1;
-      const p = addisonVideo.play?.();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => {
-          // If the browser still blocks audio, stay muted.
-          addisonVideo.muted = true;
-          addisonVideo.volume = 0;
-          hasAudio = false;
-          if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap for Sound";
-          setUnmuteOverlay({ show: true, text: "Tap to unmute" });
-        });
-      }
-      hasAudio = true;
-      armSkip();
-      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
-      setUnmuteOverlay({ show: false });
-    };
-
-    const startPlaybackWithAudio = () => {
-      if (started) return;
-      started = true;
-      armSkip();
-      if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Skip";
-      addisonVideo.muted = false;
-      addisonVideo.volume = 1;
-      const p = addisonVideo.play?.();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => {
-          // If the browser still blocks playback, allow the user to try again.
-          started = false;
-          skipArmedLocal = false;
-          if (trailerTipEl && isCoarsePointer) trailerTipEl.textContent = "Tap to Play";
-        });
-      }
-      hasAudio = true;
-    };
-
-    const onSkip = (e) => {
-      if (!e?.isTrusted) return;
-      if (!started) return;
-      // If we're autoplaying muted, first tap should enable audio (not skip).
-      if (isCoarsePointer && !hasAudio) {
-        enableAudio();
-        return;
-      }
-      if (!skipArmedLocal) return;
-      finish({ fromGesture: true });
-    };
-
-    if (isCoarsePointer) {
-      // Autoplay muted immediately to avoid a black stall, then use tap to enable audio.
-      startMutedAutoplay();
-      if (trailerTipEl) trailerTipEl.textContent = "Tap for Sound";
-      setUnmuteOverlay({ show: true, text: "Tap to unmute" });
-      // If autoplay failed for any reason, allow first gesture to start playback with audio.
-      onFirstUserGesture(() => {
-        if (!started) startPlaybackWithAudio();
-        else enableAudio();
-      }, { signal });
-      window.addEventListener("pointerdown", onSkip, { capture: true, passive: true, signal });
-      window.addEventListener("touchstart", onSkip, { capture: true, passive: true, signal });
-    } else {
-      // Desktop: attempt autoplay with audio; if blocked, fall back to muted autoplay
-      // so we don't stall on a black screen until the next gesture.
-      if (trailerTipEl) trailerTipEl.textContent = "Click to Skip";
-      const p = addisonVideo.play?.();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => {
-          addisonVideo.muted = true;
-          tryPlay(addisonVideo);
-        });
-      }
-      // We start muted by default; show the unmute affordance immediately on desktop.
-      setUnmuteOverlay({ show: true, text: "Click to unmute" });
-      onFirstUserGesture(finish, { signal });
-    }
-
-    // Keep muted UI in sync (both Addison and Trailer can be forced muted by the browser).
     const updateMutedUi = () => {
       const muted = !!addisonVideo.muted || addisonVideo.volume === 0;
       const playing = !addisonVideo.paused;
       setUnmuteOverlay({
         show: playing && muted,
-        text: isCoarsePointer ? "Tap to unmute" : "Click to unmute",
+        text: isCoarsePointer ? "Tap here to unmute" : "Click here to unmute",
       });
     };
+
     addisonVideo.addEventListener("volumechange", updateMutedUi, { passive: true, signal });
     addisonVideo.addEventListener("play", updateMutedUi, { passive: true, signal });
     addisonVideo.addEventListener("pause", () => setUnmuteOverlay({ show: false }), { passive: true, signal });
+    addisonVideo.addEventListener("loadedmetadata", () => setCursorForVideo(addisonVideo), { once: true, signal });
+    addisonVideo.addEventListener("timeupdate", () => setCursorForVideo(addisonVideo), { passive: true, signal });
+    addisonVideo.addEventListener("ended", finish, { once: true, signal });
 
-    // Unmute overlay click (works even if we also listen at window level).
+    const onSkip = () => {
+      if (!skipArmedLocal) return;
+      finish({ fromGesture: true });
+    };
+    onFirstUserGesture(onSkip, { signal });
+
     if (unmuteOverlay) {
       unmuteOverlay.addEventListener(
         "click",
         (e) => {
           e.preventDefault();
           e.stopPropagation();
-          enableAudio();
+          addisonVideo.muted = false;
+          addisonVideo.volume = 1;
+          tryPlay(addisonVideo);
+          setUnmuteOverlay({ show: false });
         },
         { signal },
       );
     }
-
-    addisonVideo.addEventListener("loadedmetadata", () => setCursorForVideo(addisonVideo), { once: true, signal });
-    addisonVideo.addEventListener("timeupdate", () => setCursorForVideo(addisonVideo), { passive: true, signal });
-    addisonVideo.addEventListener("ended", finish, { once: true, signal });
   }
 
   function startTrailerScene() {
