@@ -1189,6 +1189,13 @@ body.is-home .overlay__titleLine--b{
   justify-content:space-between;
   gap: 12px;
 }
+.financialActions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
+}
 .financialDownload{
   flex: 0 0 auto;
   margin-top: 0;
@@ -1211,10 +1218,58 @@ body.is-home .overlay__titleLine--b{
     linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.09));
   box-shadow: 0 22px 70px rgba(0,0,0,.50), 0 0 44px rgba(255,196,112,.22);
 }
+.financialTerms{
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(720px 180px at 8% 0%, rgba(255,196,112,.10), transparent 58%),
+    rgba(0,0,0,.22);
+}
+.financialTerms__label{
+  font-family: var(--font-title);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: 10px;
+  color: rgba(255,255,255,.62);
+  margin-bottom: 10px;
+}
+.financialTerms__items{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+.financialTerm__k{
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.52);
+  margin-bottom: 2px;
+}
+.financialTerm__v{
+  font-family: var(--font-title);
+  font-weight: 760;
+  letter-spacing: .06em;
+  color: rgba(255,255,255,.94);
+  font-size: clamp(13px, .28vw + 12px, 15px);
+}
 @media (max-width: 980px){
   .financialLayout{
     grid-template-columns: 170px minmax(0, 1fr);
     gap: 14px;
+  }
+  .financialFooter{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .financialActions{
+    width:100%;
+  }
+  .financialTerms__items{
+    gap: 10px 12px;
   }
 }
 @media (max-width: 720px){
@@ -1292,8 +1347,20 @@ body.is-home .overlay__titleLine--b{
     flex-direction:column;
     margin-top: 8px;
   }
+  .financialActions{
+    width:100%;
+    flex-direction:column;
+  }
   .financialDownload{
     width:100%;
+  }
+  .financialTerms{
+    margin-top: 10px;
+    padding: 10px 12px;
+  }
+  .financialTerms__items{
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 
