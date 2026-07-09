@@ -1529,6 +1529,120 @@ body.is-home .overlay__titleLine--b{
   }
 }
 
+/* Team */
+.card--team{
+  width:min(1080px, 100%);
+}
+@media (min-width: 981px){
+  .card--team{
+    width:min(1000px, calc(100% - 112px));
+    margin-right: 112px;
+  }
+}
+.teamGrid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 22px);
+  margin-top: 6px;
+}
+.teamMember{
+  min-width:0;
+  outline:none;
+}
+.teamMember__media{
+  position:relative;
+  overflow:hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.28);
+  box-shadow: 0 22px 70px rgba(0,0,0,.48);
+  aspect-ratio: 4 / 5;
+}
+.teamMember__media img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  transition: transform .35s ease, filter .35s ease;
+}
+.teamMember__bio{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:flex-end;
+  padding: 14px 12px 12px;
+  background:
+    linear-gradient(180deg, rgba(8,8,9,.18) 0%, rgba(8,8,9,.72) 48%, rgba(8,8,9,.92) 100%);
+  opacity:0;
+  transform: translateY(8px);
+  transition: opacity .28s ease, transform .28s ease;
+  pointer-events:none;
+}
+.teamMember__bio p{
+  margin:0;
+  color: rgba(255,255,255,.92);
+  font-size: clamp(12px, .22vw + 11px, 13.5px);
+  line-height: 1.4;
+  text-shadow: 0 10px 28px rgba(0,0,0,.55);
+}
+.teamMember:hover .teamMember__bio,
+.teamMember:focus-visible .teamMember__bio,
+.teamMember.is-bio-open .teamMember__bio{
+  opacity:1;
+  transform: translateY(0);
+}
+.teamMember:hover .teamMember__media img,
+.teamMember:focus-visible .teamMember__media img,
+.teamMember.is-bio-open .teamMember__media img{
+  transform: scale(1.04);
+  filter: brightness(.72);
+}
+.teamMember__meta{
+  margin-top: 10px;
+}
+.teamMember__name{
+  font-family: var(--font-title);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 760;
+  font-size: clamp(12px, .2vw + 11px, 14px);
+  color: rgba(255,255,255,.94);
+  line-height: 1.25;
+}
+.teamMember__title{
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255,255,255,.62);
+}
+@media (max-width: 900px){
+  .teamGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+@media (max-width: 520px){
+  .card--team{padding: 14px}
+  .teamGrid{
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .teamMember__bio{
+    padding: 10px 9px 9px;
+  }
+  .teamMember__bio p{
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+  .teamMember__name{font-size: 11px}
+  .teamMember__title{font-size: 11px}
+}
+@media (hover: none){
+  .teamMember__bio{
+    transition: opacity .22s ease, transform .22s ease;
+  }
+}
+
 /* Contact CTA: external links (glassmorphism pills) */
 .contactStack{
   width: min(980px, 100%);

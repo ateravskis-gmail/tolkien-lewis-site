@@ -1259,6 +1259,21 @@
     });
   }
 
+  // Team: tap-to-reveal bios on touch / coarse pointers
+  const teamMembers = qsa(".teamMember");
+  for (const member of teamMembers) {
+    member.addEventListener("click", (e) => {
+      if (!isCoarsePointer && !window.matchMedia?.("(hover: none)")?.matches) return;
+      e.preventDefault();
+      const wasOpen = member.classList.contains("is-bio-open");
+      for (const m of teamMembers) m.classList.remove("is-bio-open");
+      if (!wasOpen) member.classList.add("is-bio-open");
+    });
+    member.addEventListener("blur", () => {
+      member.classList.remove("is-bio-open");
+    });
+  }
+
   for (const chip of epChips) {
     const ep = chip.getAttribute("data-ep-chip") || "1";
     chip.addEventListener("click", () => {
