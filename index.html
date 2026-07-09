@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500..900&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=nar26" />
+    <link rel="stylesheet" href="./styles.css?v=nar27" />
   </head>
   <body>
     <!-- Right-side scroll roadmap (Apple Dock-inspired) -->
@@ -35,9 +35,9 @@
         <span class="roadmap__dot" aria-hidden="true"></span>
         <span class="roadmap__label">Overview III</span>
       </button>
-      <button class="roadmap__item" type="button" data-roadmap-jump="imperative">
+      <button class="roadmap__item" type="button" data-roadmap-jump="why-now">
         <span class="roadmap__dot" aria-hidden="true"></span>
-        <span class="roadmap__label">Imperative</span>
+        <span class="roadmap__label">Why Now</span>
       </button>
       <button class="roadmap__item" type="button" data-roadmap-jump="approach">
         <span class="roadmap__dot" aria-hidden="true"></span>
@@ -50,10 +50,6 @@
       <button class="roadmap__item" type="button" data-roadmap-jump="investment">
         <span class="roadmap__dot" aria-hidden="true"></span>
         <span class="roadmap__label">Investment</span>
-      </button>
-      <button class="roadmap__item" type="button" data-roadmap-jump="why-now">
-        <span class="roadmap__dot" aria-hidden="true"></span>
-        <span class="roadmap__label">Why Now</span>
       </button>
       <button class="roadmap__item" type="button" data-roadmap-jump="proof">
         <span class="roadmap__dot" aria-hidden="true"></span>
@@ -117,9 +113,7 @@
         <div class="bg-slide" data-bg="overview-1" style="background-image:url('./assets/WWI.jpg')"></div>
         <div class="bg-slide" data-bg="overview-2" style="background-image:url('./assets/2LMR64BE.jpg')"></div>
         <div class="bg-slide" data-bg="overview-3" style="background-image:url('./assets/Oxford.jpg')"></div>
-        <video class="bg-video" data-bg="imperative" muted loop playsinline preload="metadata">
-          <source src="./assets/WFME_BG.mp4?v=nar17" type="video/mp4" />
-        </video>
+        <div class="bg-slide" data-bg="why-now" style="background-image:url('./assets/1236642_Fantastic+Beasts+and+Where+To+Find+Them+bts+2.jpg')"></div>
         <video class="bg-video" data-bg="approach" muted loop playsinline preload="metadata">
           <source src="./assets/OxfordBG.mp4?v=nar17" type="video/mp4" />
         </video>
@@ -128,7 +122,6 @@
         <div class="bg-slide" data-bg="ep3" style="background-image:url('./assets/Microphone.jpg')"></div>
         <div class="bg-slide" data-bg="ep4" style="background-image:url('./assets/ep5.jpg')"></div>
         <div class="bg-slide" data-bg="investment" style="background-image:url('./assets/WWI_soldiers.jpg')"></div>
-        <div class="bg-slide" data-bg="why-now" style="background-image:url('./assets/1236642_Fantastic+Beasts+and+Where+To+Find+Them+bts+2.jpg')"></div>
         <div class="bg-slide" data-bg="proof" style="background-image:url('./BRHeroArt.jpg')"></div>
       </div>
 
@@ -240,25 +233,44 @@
         </div>
       </div>
 
-      <div class="overlay overlay--panel" data-scene="imperative" data-len="2">
-        <div class="card card--panel">
-          <div class="card__label">The Project’s Imperative</div>
-          <div class="prose">
-            <p class="lead">
-              The creative friendship between Tolkien and Lewis offers an enduring and inspiring model of cultural
-              leadership. We, too, face a cultural crisis: fresh assaults on the political, moral, and religious ideals
-              that shaped Western civilization and made possible the American experiment in ordered freedom. By
-              exploring the lives and achievements of Tolkien and Lewis, our feature documentary will reveal how
-              their shared moral vision created
-              a new beachhead for what philosopher Russel Kirk called “the permanent things” amid a deeply hostile
-              culture.
-            </p>
-          </div>
-          <div class="callout callout--dark">
-            <div class="callout__title"></div>
-            <p class="callout__text">
-              This extraordinary story of war, friendship, faith, and imagination has never been told before: We intend to tell it.
-            </p>
+      <div class="overlay overlay--panel" data-scene="why-now" data-len="2">
+        <div class="card card--panel card--whyNow">
+          <div class="whyNowLayout">
+            <figure class="whyNowImage">
+              <img
+                src="./assets/meryl-streep-aslan-narnia.jpg"
+                alt="Meryl Streep and Aslan from Deadline's Narnia casting report"
+                loading="lazy"
+              />
+              <figcaption>Image: Deadline / Getty / Everett</figcaption>
+            </figure>
+
+            <div class="whyNowContent">
+              <div class="card__label">Our Crisis Moment</div>
+              <div class="prose">
+                <p class="lead">
+                  <strong>The time is now:</strong> the pillars of Western Civilization are under siege.
+                </p>
+                <p>
+                  <a
+                    href="https://deadline.com/2025/04/meryl-streep-aslan-greta-gerwig-netflix-narnia-movie-1236358278/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >Deadline reports</a>
+                  that Meryl Streep has been cast as the male Christ-figure Aslan in Netflix's <em>The Magician's Nephew</em>. 
+                  But this should not surprise us: our schools and universities no longer transmit our Judeo-Christian 
+                  inheritance, allowing radical ideologies to overtake our most important institutions.
+                </p>
+                <p>
+                  It was this attack on the moral foundations of the West that Tolkien and Lewis battled against. 
+                  We have much to learn from their example.
+                </p>
+              </div>
+
+              <div class="whyNowCallout">
+                We face a cultural crisis: fresh assaults on the political, moral, and religious ideals that shaped our Western civilization.
+              </div>
+            </div>
           </div>
           <div class="scrollPrompt" aria-hidden="true">Scroll</div>
         </div>
@@ -269,8 +281,8 @@
           <div class="card__label">Approach and Synopsis</div>
           <div class="prose">
             <p class="lead">
-              The film will be based on Joseph Loconte’s New York Times bestseller, <em>A Hobbit, a Wardrobe, and a Great
-              War</em> and on his newly released book, <em>The War for Middle-earth: J.R.R. Tolkien and C.S. Lewis Confront the
+              The film will be based on Joseph Loconte’s two bestselling books: <em>A Hobbit, a Wardrobe, and a Great
+              War</em> and <em>The War for Middle-earth: J.R.R. Tolkien and C.S. Lewis Confront the
               Gathering Storm, 1933-1945</em>. Mr. Loconte will serve as the film’s historian, screenwriter, and host.
             </p>
           </div>
@@ -442,44 +454,6 @@
         </div>
       </div>
 
-      <div class="overlay overlay--panel" data-scene="why-now" data-len="2">
-        <div class="card card--panel card--whyNow">
-          <div class="whyNowLayout">
-            <figure class="whyNowImage">
-              <img
-                src="./assets/meryl-streep-aslan-narnia.jpg"
-                alt="Meryl Streep and Aslan from Deadline's Narnia casting report"
-                loading="lazy"
-              />
-              <figcaption>Image: Deadline / Getty / Everett</figcaption>
-            </figure>
-
-            <div class="whyNowContent">
-              <div class="card__label">Why Now</div>
-              <div class="prose">
-                <p class="lead">
-                  <strong>The time is now:</strong> the pillars of Western Civilization are under siege.
-                </p>
-                <p>
-                  <a
-                    href="https://deadline.com/2025/04/meryl-streep-aslan-greta-gerwig-netflix-narnia-movie-1236358278/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >Deadline reports</a>
-                  that Meryl Streep has been cast as Aslan in Greta Gerwig's <em>The Magician's Nephew</em>. For Lewis’s readers, Aslan is the moral and theological center of
-                  Narnia. This modernist reinterpretation is almost certain to trigger yet another cultural firestorm.
-                </p>
-              </div>
-
-              <div class="whyNowCallout">
-                That controversy creates an opportunity for <em>The War for Middle-Earth</em>: a film about the shared moral vision of Tolkien and Lewis and how it influenced their work.
-              </div>
-            </div>
-          </div>
-          <div class="scrollPrompt" aria-hidden="true">Scroll</div>
-        </div>
-      </div>
-
       <div class="overlay overlay--panel" data-scene="proof" data-len="2">
         <div class="card card--panel card--proof">
           <div class="proofLayout">
@@ -570,7 +544,7 @@
     <!-- Scroll controls a timeline; the visuals remain fixed to create “entering the field of view”. -->
     <div class="scrollspace" data-scrollspace aria-hidden="true"></div>
 
-    <script src="./script.js?v=nar25"></script>
+    <script src="./script.js?v=nar27"></script>
   </body>
 </html>
 

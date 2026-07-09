@@ -727,20 +727,6 @@ body.is-addison .stage__interstitial{
     letter-spacing: .12em;
   }
 
-  /* Imperative: tighten a bit further (this panel is text-heavy). */
-  .overlay[data-scene="imperative"] .prose .lead{
-    font-size: 14px;
-    line-height: 1.38;
-  }
-  .overlay[data-scene="imperative"] .callout--dark{
-    margin-top: 10px;
-    padding-top: 36px;
-  }
-  .overlay[data-scene="imperative"] .callout--dark .callout__text{
-    font-size: 14px;
-    line-height: 1.36;
-  }
-
   /* Story: mobile filmstrip picker + selected part display */
   .episodesTop{display:none}
   .episodesDock{display:none}
@@ -983,7 +969,7 @@ body.is-home .overlay__titleLine--b{
 /* Subtle readability boost on the busiest backgrounds (keep it understated). */
 @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
   .overlay[data-scene="overview-3"] .card--panel,
-  .overlay[data-scene="imperative"] .card--panel{
+  .overlay[data-scene="why-now"] .card--panel{
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     /* Nudge background slightly darker so the blur reads as "clarity" not "glass." */
@@ -1545,11 +1531,11 @@ body.is-home .overlay__titleLine--b{
   color: rgba(255,255,255,.88);
 }
 
-/* Keep primary copy size consistent across Overview + Imperative panels. */
+/* Keep primary copy size consistent across Overview + Why Now panels. */
 .overlay[data-scene="overview-1"] .prose .lead,
 .overlay[data-scene="overview-2"] .prose .lead,
 .overlay[data-scene="overview-3"] .prose .lead,
-.overlay[data-scene="imperative"] .prose .lead{
+.overlay[data-scene="why-now"] .prose .lead{
   font-size: clamp(18px, 1.15vw + 14px, 21px);
   line-height: 1.64;
 }

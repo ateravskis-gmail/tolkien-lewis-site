@@ -57,7 +57,7 @@
   let bgSegments = []; // merged [{start,end}] ranges where bg layer should stay up (dip-to-black between fades)
   let addisonAC = null;
   let addisonTriggerAt = null; // progress value where we should trigger the interstitial
-  let imperativeRange = null; // { start, end } resume point for post-Addison jump
+  let whyNowRange = null; // { start, end } resume point for post-Addison jump
   let addisonPlayed = false;
   let episodesRange = null; // { start, end }
   let episodesInitialized = false;
@@ -159,12 +159,12 @@
 
     const o1 = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "overview-1");
     const o3 = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "overview-3");
-    const imperative = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "imperative");
+    const whyNow = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "why-now");
     const episodes = ranges.find((r) => r.el?.getAttribute?.("data-scene") === "story");
     overviewBgRange = o1 && o3 ? { start: o1.start, end: o3.end } : null;
     overviewStart = o1?.start ?? 0;
     addisonTriggerAt = o3?.end ?? null;
-    imperativeRange = imperative ? { start: imperative.start, end: imperative.end } : null;
+    whyNowRange = whyNow ? { start: whyNow.start, end: whyNow.end } : null;
     episodesRange = episodes ? { start: episodes.start, end: episodes.end } : null;
 
     sceneStartByName = new Map();
@@ -638,8 +638,8 @@
     let bgLayerOpacity = inEpisodesSegment || inBgSegment ? 1 : 0;
     let firstBgV = 0;
 
-    // Addison's Walk interstitial (once): after overview-3 and before imperative.
-    if (mode === "home" && !addisonPlayed && addisonTriggerAt != null && imperativeRange != null && p >= addisonTriggerAt) {
+    // Addison's Walk interstitial (once): after overview-3 and before why-now.
+    if (mode === "home" && !addisonPlayed && addisonTriggerAt != null && whyNowRange != null && p >= addisonTriggerAt) {
       startAddisonScene();
       return;
     }
@@ -879,7 +879,7 @@
   function startAddisonScene() {
     if (mode === "addison") return;
     if (!addisonVideo) return;
-    if (addisonTriggerAt == null || imperativeRange == null) return;
+    if (addisonTriggerAt == null || whyNowRange == null) return;
     addisonPlayed = true;
 
     mode = "addison";
@@ -916,11 +916,11 @@
       } else {
         bindScrollSnapping();
       }
-      // Jump to imperative start and immediately render the card (avoid any black "gap").
-      // Jump *into* the imperative range (past fade-in) so it's visible instantly.
-      const span = imperativeRange.end - imperativeRange.start;
+      // Jump to why-now start and immediately render the card (avoid any black "gap").
+      // Jump *into* the why-now range (past fade-in) so it's visible instantly.
+      const span = whyNowRange.end - whyNowRange.start;
       const fade = prefersReduced ? span * 0.1 : span * 0.18;
-      const jumpP = imperativeRange.start + Math.min(span * 0.35, fade * 1.25);
+      const jumpP = whyNowRange.start + Math.min(span * 0.35, fade * 1.25);
       setProgress(jumpP);
       lastP = -1;
       uiDirty = true;
