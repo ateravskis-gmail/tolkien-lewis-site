@@ -1532,6 +1532,7 @@ body.is-home .overlay__titleLine--b{
 /* Team */
 .card--team{
   width:min(1080px, 100%);
+  pointer-events:auto;
 }
 @media (min-width: 981px){
   .card--team{
@@ -1548,6 +1549,8 @@ body.is-home .overlay__titleLine--b{
 .teamMember{
   min-width:0;
   outline:none;
+  cursor:pointer;
+  pointer-events:auto;
 }
 .teamMember__media{
   position:relative;
@@ -1568,6 +1571,7 @@ body.is-home .overlay__titleLine--b{
 .teamMember__bio{
   position:absolute;
   inset:0;
+  z-index: 2;
   display:flex;
   align-items:flex-end;
   padding: 14px 12px 12px;
